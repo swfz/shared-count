@@ -8,6 +8,16 @@
 - development
     - 'dev-memo-raw-data'
 
+```
+TODO: gcloudで
+```
+
+### Topicの作成
+
+```
+TODO: gcloudで
+```
+
 ### API
 - Twitter
     - 事前にデータを収集するよう申請する(https://jsoon.digitiminimi.com/)
