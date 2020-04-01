@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "functions-framework --target=collectFacebookCount --signature-type=event",
+    "deploy": "gcloud functions deploy collectFacebookCount --trigger-topic=memo-collector-facebook --runtime nodejs10 --region asia-northeast1 --set-env-vars BUCKET=memo-raw-data",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
