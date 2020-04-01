@@ -15,7 +15,7 @@ TODO: gcloudで
 ### Topicの作成
 
 ```
-TODO: gcloudで
+gcloud pubsub topics create memo-collector-twitter
 ```
 
 ### API
@@ -51,6 +51,7 @@ curl -v -XPOST -H 'Content-Type:application/json; charset=utf-8' -d "{\"data\": 
 ## deploy
 
 ```
+cd twitter
 gcloud functions deploy collectTwitterCount --trigger-topic=memo-collector-twitter --runtime nodejs10 --region asia-northeast1
 ```
 
