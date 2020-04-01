@@ -1,0 +1,18 @@
+{
+  "name": "shared-count-hatena",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@google-cloud/functions-framework": "^1.5.0"
+  },
+  "dependencies": {
+    "@google-cloud/storage": "^4.7.0",
+    "node-fetch": "^2.6.0"
+  }
+}
