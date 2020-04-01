@@ -15,7 +15,7 @@ exports.collectFacebookCount = async (event, context) => {
   const urlBase = 'http://graph.facebook.com/v6.0/?id=';
   const requestUrl = `${urlBase}${params.url}&fields=og_object{engagement}`;
 
-  const bucketName = (process.env['NODE_ENV'] == 'production') ? 'memo-raw-data' : 'dev-memo-raw-data';
+  const bucketName = process.env['BUCKET'];
   const storage = new Storage();
 
   const res = await fetch(requestUrl).then((res) => {

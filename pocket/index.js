@@ -17,7 +17,7 @@ exports.collectPocketCount = async (event, context) => {
 
   const requestUrl = `https://widgets.getpocket.com/v1/button?v=1&count=vertical&url=${params.url}&src=${params.url}`;
 
-  const bucketName = (process.env['NODE_ENV'] == 'production') ? 'memo-raw-data' : 'dev-memo-raw-data';
+  const bucketName = process.env['BUCKET'];
   const storage = new Storage();
 
   await page.goto(requestUrl);
@@ -31,3 +31,4 @@ exports.collectPocketCount = async (event, context) => {
 
   await file.save(JSON.stringify({count: count}));
 };
+

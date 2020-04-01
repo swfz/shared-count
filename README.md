@@ -21,14 +21,33 @@ gcloud pubsub topics create memo-collector-twitter
 ### API
 - Twitter
     - 事前にデータを収集するよう申請する(https://jsoon.digitiminimi.com/)
+- haetna
+    - API
+- Facebook
+    - graph API
+- Pocket
+    - scraping...
 
 ## development
 
+- environment
+
+環境変数の設定が必要
+
+| name | description |
+|:-|:-|
+| GOOGLE_APPLICATION_CREDENTIALS | credentialファイルのパス |
+| BUCKET | テストで使用するバケット名 |
+
+
 - start server
+
+BUCKETは開発で使うストレージのバケット名
 
 ```
 cd twitter
 npm ci
+export BUCKET=dev-memo-raw-data
 npx functions-framework --target=collectTwitterCount --signature-type=event
 ```
 
@@ -50,9 +69,11 @@ curl -XPOST -H 'Content-Type:application/json; charset=utf-8' -d "{\"data\": {\"
 
 ## deploy
 
+BUCKETは任意のバケット名
+
 ```
 cd twitter
-gcloud functions deploy collectTwitterCount --trigger-topic=memo-collector-twitter --runtime nodejs10 --region asia-northeast1
+gcloud functions deploy collectTwitterCount --trigger-topic=memo-collector-twitter --runtime nodejs10 --region asia-northeast1 --set-env-vars BUCKET=memo-raw-data
 ```
 
 ## publish message

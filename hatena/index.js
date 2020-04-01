@@ -15,7 +15,7 @@ exports.collectHatenaCount = async (event, context) => {
   const urlBase = 'http://b.hatena.ne.jp/entry/jsonlite/?url=';
   const requestUrl = `${urlBase}${params.url}`;
 
-  const bucketName = (process.env['NODE_ENV'] == 'production') ? 'memo-raw-data' : 'dev-memo-raw-data';
+  const bucketName = process.env['BUCKET'];
   const storage = new Storage();
 
   const res = await fetch(requestUrl).then((res) => {
