@@ -44,7 +44,7 @@ npx functions-framework --target=collectTwitterCount --signature-type=event
 - 確認
 
 ```
-curl -v -XPOST -H 'Content-Type:application/json; charset=utf-8' -d "{\"data\": {\"data\": \"$(cat event.json|base64|tr -d '\n')\"}}" http://localhost:8080/
+curl -XPOST -H 'Content-Type:application/json; charset=utf-8' -d "{\"data\": {\"data\": \"$(cat event.json|base64|tr -d '\n')\"}}" http://localhost:8080/
 ```
 
 
