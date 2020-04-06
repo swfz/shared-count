@@ -69,9 +69,9 @@ const getArticles = async () => {
   const fileName = process.env['ARTICLES_PATH']
   const storage = new Storage();
 
-  await storage.bucket(bucketName).file(fileName).download({destination: `${os.tempdir()}/articles.json`});
+  await storage.bucket(bucketName).file(fileName).download({destination: `${os.tmpdir()}/articles.json`});
 
-  const articlesJSONLines = fs.readFileSync(`${os.tempdir()}/articles.json`, 'utf8');
+  const articlesJSONLines = fs.readFileSync(`${os.tmpdir()}/articles.json`, 'utf8');
   const json = `[${articlesJSONLines.replace(/\n/gi,',').replace(/,$/,'')}]`;
 
   return JSON.parse(json);
