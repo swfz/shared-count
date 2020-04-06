@@ -8,8 +8,12 @@
 const {Storage} = require('@google-cloud/storage');
 const {PubSub} = require('@google-cloud/pubsub');
 const fs = require('fs');
+const os = require('os');
 
 exports.publishToCollector = async (event, context) => {
+  const payload = Buffer.from(event.data, 'base64').toString();
+  const params = JSON.parse(payload);
+
   const services = ['twitter', 'pocket', 'facebook', 'hatena'];
   const articles = await getArticles();
 
@@ -65,9 +69,9 @@ const getArticles = async () => {
   const fileName = process.env['ARTICLES_PATH']
   const storage = new Storage();
 
-  await storage.bucket(bucketName).file(fileName).download({destination: './articles.json'});
+  await storage.bucket(bucketName).file(fileName).download({destination: `${os.tempdir()}/articles.json`});
 
-  const articlesJSONLines = fs.readFileSync('./articles.json', 'utf8');
+  const articlesJSONLines = fs.readFileSync(`${os.tempdir()}/articles.json`, 'utf8');
   const json = `[${articlesJSONLines.replace(/\n/gi,',').replace(/,$/,'')}]`;
 
   return JSON.parse(json);
