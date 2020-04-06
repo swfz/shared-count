@@ -1,5 +1,8 @@
 # shared count collector
 
+
+article url * service の単位でシェア数を取得するFunction
+
 ## requirements
 ### GCS bucket
 - 事前に作っておく
@@ -12,7 +15,7 @@
 TODO: gcloudで
 ```
 
-### Topicの作成
+### Pub/Sub Topic
 
 ```
 gcloud pubsub topics create memo-collector-twitter
