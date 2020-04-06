@@ -14,10 +14,11 @@ exports.publishToCollector = async (event, context) => {
   const payload = Buffer.from(event.data, 'base64').toString();
   const params = JSON.parse(payload);
 
-  const services = ['twitter', 'pocket', 'facebook', 'hatena'];
+  const services = params['services'] ? params['services'] : ['twitter', 'pocket', 'facebook', 'hatena'];
+  const hour = params['hour'] ? params['hour'] : (new Date()).getHours();
   const articles = await getArticles();
 
-  const target = filterTargetArticles(articles, (new Date()).getHours());
+  const target = filterTargetArticles(articles, hour);
 
   const pubsub = new PubSub();
   const topicPrefix = process.env['TOPIC_PREFIX'];
