@@ -23,7 +23,7 @@ gcloud pubsub topics create memo-collector-publish
 - scheduler
 
 ```
-gcloud scheduler jobs create pubsub publish-job --schedule="2 * * * *" --topic=memo-collector-publish --message-body="publish"
+gcloud scheduler jobs create pubsub publish-job --schedule="2 * * * *" --topic=memo-collector-publish --message-body="{}"
 ```
 
 ## development
@@ -58,7 +58,11 @@ curl -XPOST -H 'Content-Type:application/json; charset=utf-8' http://localhost:8
 
 ## deploy
 
+default 60 seconds
+
+最大9分 → 540
+
 ```
-gcloud functions deploy publishToCollector --trigger-topic=memo-collector-publish --runtime nodejs10 --region asia-northeast1 --set-env-vars ARTICLES_BUCKET=memo-raw-data,ARTICLES_PATH=articles/articles.json,TOPIC_RREFIX=memo-collector-
+gcloud functions deploy publishToCollector --trigger-topic=memo-collector-publish --runtime nodejs10 --region asia-northeast1 --set-env-vars ARTICLES_BUCKET=memo-raw-data,ARTICLES_PATH=articles/articles.json,TOPIC_PREFIX=memo-collector- --timeout=540
 ```
 
