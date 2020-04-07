@@ -29,6 +29,6 @@ exports.collectPocketCount = async (event, context) => {
   const bucket = storage.bucket(bucketName);
   const file = bucket.file(`share-count/service=${params.service}/${encodeURIComponent(params.url)}`);
 
-  await file.save(JSON.stringify({count: count}));
+  await file.save(JSON.stringify({count: count, url: params.url}));
 };
 
