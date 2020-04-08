@@ -14,7 +14,7 @@ exports.publishToCollector = async (event, context) => {
   const payload = Buffer.from(event.data, 'base64').toString();
   const params = JSON.parse(payload);
 
-  const services = params['services'] ? params['services'] : ['twitter', 'pocket', 'facebook', 'hatena'];
+  const services = params['services'] ? params['services'] : ['twitter', 'pocket', 'facebook', 'hatena', 'hatenastar'];
   const hour = params['hour'] ? params['hour'] : (new Date()).getHours();
   const articles = await getArticles();
 

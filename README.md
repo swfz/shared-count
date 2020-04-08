@@ -25,7 +25,9 @@ gcloud pubsub topics create memo-collector-twitter
 - Twitter
     - 事前にデータを収集するよう申請する(https://jsoon.digitiminimi.com/)
 - haetna
-    - API
+    - bookmark API
+- hatenastar
+    - star API
 - Facebook
     - graph API
 - Pocket
