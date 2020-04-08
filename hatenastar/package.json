@@ -1,0 +1,20 @@
+{
+  "name": "shared-count-hatenastar",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "functions-framework --target=collectHatenaStarCount --signature-type=event",
+    "deploy": "gcloud functions deploy collectHatenaStarCount --trigger-topic=memo-collector-hatenastar --runtime nodejs10 --region asia-northeast1 --set-env-vars BUCKET=memo-raw-data",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@google-cloud/functions-framework": "^1.5.1"
+  },
+  "dependencies": {
+    "@google-cloud/storage": "^4.7.0",
+    "node-fetch": "^2.6.0"
+  }
+}
