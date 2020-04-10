@@ -15,10 +15,12 @@ from functools import reduce
 from pprint import pprint
 from apache_beam import pvalue
 
+from bq_schema import HatenaSchema, BqSchema
+from transform import Transform
+
+
 class ExtractService(beam.DoFn):
-
     def process(self, element):
-
         if 'likes' in element:
             yield pvalue.TaggedOutput('twitter', element)
         elif 'eid' in element:
@@ -31,89 +33,36 @@ class ExtractService(beam.DoFn):
             yield pvalue.TaggedOutput('facebook', element)
 
 
+class ExtractHatena(beam.DoFn):
+    def process(self, element):
+        if 'comment' in element:
+            yield pvalue.TaggedOutput('comment', element)
+        elif 'tag' in element:
+            yield pvalue.TaggedOutput('tag', element)
+        elif 'timestamp' in element:
+            yield pvalue.TaggedOutput('bookmark', element)
+        elif 'metric' in element:
+            yield pvalue.TaggedOutput('summary', element)
+
+
 def parse_twitter(element):
-    return [{
-            'url': element['url'],
-            'service': 'twitter',
-            'metric': 'shared',
-            'value': element['count'],
-            }, {
-            'url': element['url'],
-            'service': 'twitter',
-            'metric': 'likes',
-            'value': element['likes'],
-            }]
+    return Transform().parse_twitter(element)
 
 
 def parse_pocket(element):
-    return {
-            'url': element['url'],
-            'service': 'pocket',
-            'metric': 'count',
-            'value': element['count']
-            }
+    return Transform().parse_pocket(element)
 
 
 def parse_facebook(element):
-    value = element['og_object']['engagement']['count'] if 'og_object' in element else 0
-
-    return {
-            'url': element['id'],
-            'service': 'facebook',
-            'metric': 'share',
-            'value': value
-            }
+    return Transform().parse_facebook(element)
 
 
-# comment, tagsもどこかで派生させて保存する
 def parse_hatena(element):
-    return {
-            'url': element['requested_url'],
-            'service': 'hatena',
-            'metric': 'bookmark',
-            'value': element['count']
-            }
+    return Transform().parse_hatena(element)
 
 
-# nameもどっかに派生させる
 def parse_hatena_star(element):
-    pprint(element)
-
-    star = len(element['entries'][0]['stars']) if 'stars' in element['entries'][0] else 0
-    colored = len(element['entries'][0]['colored_stars']) if 'colored_stars' in element['entries'][0] else 0
-    return [{
-            'url': element['entries'][0]['uri'],
-            'service': 'hatena',
-            'metric': 'star',
-            'value': star,
-            }, {
-            'url': element['entries'][0]['uri'],
-            'service': 'hatena',
-            'metric': 'colorstar',
-            'value': colored,
-            }]
-
-
-def get_data_schema():
-    return {
-            'fields': [{
-                'name': 'url', 'type': 'STRING', 'mode': 'REQUIRED'
-            }, {
-                'name': 'twitter_shared', 'type': 'INT64', 'mode': 'NULLABLE'
-            }, {
-                'name': 'twitter_likes', 'type': 'INT64', 'mode': 'NULLABLE'
-            }, {
-                'name': 'pocket_count', 'type': 'INT64', 'mode': 'NULLABLE'
-            }, {
-                'name': 'hatena_bookmark', 'type': 'INT64', 'mode': 'NULLABLE'
-            }, {
-                'name': 'hatena_star', 'type': 'INT64', 'mode': 'NULLABLE'
-            }, {
-                'name': 'hatena_colorstar', 'type': 'INT64', 'mode': 'NULLABLE'
-            }, {
-                'name': 'facebook_share', 'type': 'INT64', 'mode': 'NULLABLE'
-            }]
-        }
+    return Transform().parse_hatena_star(element)
 
 
 def merge_metrics(tpl):
@@ -170,22 +119,29 @@ def run(argv=None, save_main_session=True):
         rows_twitter = mixed_data.twitter | beam.FlatMap(parse_twitter)
         rows_pocket = mixed_data.pocket | beam.Map(parse_pocket)
         rows_facebook = mixed_data.facebook | beam.Map(parse_facebook)
-        rows_hatena = mixed_data.hatena | beam.Map(parse_hatena)
-        rows_hatenastar = mixed_data.hatenastar | beam.FlatMap(parse_hatena_star)
 
-        result = (rows_twitter, rows_pocket, rows_facebook, rows_hatena, rows_hatenastar) \
+        mixed_hatena = mixed_data.hatena | beam.FlatMap(parse_hatena)
+        mixed_hatenastar = mixed_data.hatenastar | beam.FlatMap(parse_hatena_star)
+
+        hatena = (mixed_hatena, mixed_hatenastar) \
+            | 'FlattenHatenaData' >> beam.Flatten() \
+            | 'ExtractHatena' >> beam.ParDo(ExtractHatena()).with_outputs()
+
+        # rows_hatena_bookmark = hatena.bookmark
+        # rows_hatena_tag = hatena.tag
+        # rows_hatena_star = hatena.star
+
+        result = (rows_twitter, rows_pocket, rows_facebook, hatena.summary) \
             | 'Flatten' >> beam.Flatten() \
             | 'PairWithUrl' >> beam.Map(lambda x: (x['url'], x)) \
             | 'GroupByUrl' >> beam.GroupByKey() \
             | 'Merge' >> beam.Map(merge_metrics)
 
         if(known_args.env == 'prod'):
-            table_schema = get_data_schema()
-
             result | 'WriteTextToGcs' >> WriteToText(known_args.output)
             result | 'WriteTextToBigQuery' >> beam.io.WriteToBigQuery(
                             known_args.table_spec,
-                            schema=table_schema,
+                            schema=BqSchema.summary,
                             write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
                             create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
                             )
