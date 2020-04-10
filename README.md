@@ -2,7 +2,11 @@
 
 ## Architecture
 
+### API Data Collector
+
 ![text](api_data_collector.png)
+
+### Aggregate Share Count
 
 ![text](aggregate_share_count.png)
 
