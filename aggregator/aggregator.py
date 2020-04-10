@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+# coding=utf-8
+
 import apache_beam as beam
 
 import argparse
@@ -154,6 +157,7 @@ def run(argv=None, save_main_session=True):
 
     known_args, pipeline_args = parser.parse_known_args(argv)
 
+    pprint(known_args.input)
     pipeline_options = PipelineOptions(pipeline_args)
     pipeline_options.view_as(SetupOptions).save_main_session = save_main_session
     with beam.Pipeline(options=pipeline_options) as p:
