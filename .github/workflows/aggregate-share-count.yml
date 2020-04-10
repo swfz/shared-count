@@ -23,6 +23,7 @@ jobs:
           export_default_credentials: true
 
       - run: |
+          pip install apache_beam[gcp]
           python aggregator/aggregator.py --project ${{ secrets.GCP_PROJECT_ID }} \
             --runner DataflowRunner \
             --temp_location gs://${{ secrets.GCP_PROJECT_ID }}/temp \
