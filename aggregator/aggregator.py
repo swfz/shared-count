@@ -45,26 +45,6 @@ class ExtractHatena(beam.DoFn):
             yield pvalue.TaggedOutput('summary', element)
 
 
-def parse_twitter(element):
-    return Transform().parse_twitter(element)
-
-
-def parse_pocket(element):
-    return Transform().parse_pocket(element)
-
-
-def parse_facebook(element):
-    return Transform().parse_facebook(element)
-
-
-def parse_hatena(element):
-    return Transform().parse_hatena(element)
-
-
-def parse_hatena_star(element):
-    return Transform().parse_hatena_star(element)
-
-
 def merge_metrics(tpl):
     key, values = tpl
 
@@ -116,12 +96,12 @@ def run(argv=None, save_main_session=True):
                        | 'ExcludeNone' >> beam.Filter(lambda e: e is not None) \
                        | 'DivideService' >> beam.ParDo(ExtractService()).with_outputs()
 
-        rows_twitter = mixed_data.twitter | beam.FlatMap(parse_twitter)
-        rows_pocket = mixed_data.pocket | beam.Map(parse_pocket)
-        rows_facebook = mixed_data.facebook | beam.Map(parse_facebook)
+        rows_twitter = mixed_data.twitter | beam.FlatMap(Transform().parse_twitter)
+        rows_pocket = mixed_data.pocket | beam.Map(Transform().parse_pocket)
+        rows_facebook = mixed_data.facebook | beam.Map(Transform().parse_facebook)
 
-        mixed_hatena = mixed_data.hatena | beam.FlatMap(parse_hatena)
-        mixed_hatenastar = mixed_data.hatenastar | beam.FlatMap(parse_hatena_star)
+        mixed_hatena = mixed_data.hatena | beam.FlatMap(Transform().parse_hatena)
+        mixed_hatenastar = mixed_data.hatenastar | beam.FlatMap(Transform().parse_hatena_star)
 
         hatena = (mixed_hatena, mixed_hatenastar) \
             | 'FlattenHatenaData' >> beam.Flatten() \
@@ -136,8 +116,26 @@ def run(argv=None, save_main_session=True):
             | 'Merge' >> beam.Map(merge_metrics)
 
         if(known_args.env == 'prod'):
-            result | 'WriteTextToGcs' >> WriteToText(known_args.output)
-            result | 'WriteTextToBigQuery' >> beam.io.WriteToBigQuery(
+            result | 'WriteSummaryToGcs' >> WriteToText(known_args.output)
+            hatena.bookmark | 'WriteBookmarkToBigQuery' >> beam.io.WriteToBigQuery(
+                            known_args.table_spec,
+                            schema=BqSchema.bookmark,
+                            write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
+                            create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
+                            )
+            hatena.tag | 'WriteTagToBigQuery' >> beam.io.WriteToBigQuery(
+                            known_args.table_spec,
+                            schema=BqSchema.tag,
+                            write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
+                            create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
+                            )
+            hatena.tag | 'WriteStarToBigQuery' >> beam.io.WriteToBigQuery(
+                            known_args.table_spec,
+                            schema=BqSchema.star,
+                            write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
+                            create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
+                            )
+            result | 'WriteSummaryToBigQuery' >> beam.io.WriteToBigQuery(
                             known_args.table_spec,
                             schema=BqSchema.summary,
                             write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
