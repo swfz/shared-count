@@ -26,8 +26,9 @@ jobs:
           pip3 install --upgrade virtualenv --user
           python3 -m virtualenv env
           source env/bin/activate
-          pip3 install --quiet apache-beam[gcp]
+          pip3 install --quiet --user apache-beam[gcp]
 
+      - run: |
           python3 aggregator/aggregator.py --project ${{ secrets.GCP_PROJECT_ID }} \
             --runner DataflowRunner \
             --temp_location gs://${{ secrets.GCP_PROJECT_ID }}/temp \
