@@ -1,5 +1,22 @@
 # shared count collector
 
+## Architecture
+
+![text](api_data_collector.png)
+
+![text](aggregate_share_count.png)
+
+
+## directory
+- hatena
+- hatenastar
+- facebook
+- pocket
+- twitter
+- publisher
+    - 各種functionへのmessage publishする関数
+- aggregator
+    - GCS to BQ with dataflow
 
 article url * service の単位でシェア数を取得するFunction
 
