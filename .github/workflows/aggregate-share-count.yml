@@ -21,12 +21,12 @@ jobs:
           export_default_credentials: true
 
       - run: |
-        python aggregator/aggregator.py --project ${{ secrets.GCP_PROJECT_ID }} \
-          --runner DataflowRunner \
-          --temp_location gs://${{ secrets.GCP_PROJECT_ID }}/temp \
-          --job_name aggregate \
-          --table ${{ secrets.GCP_PROJECT_ID }}:blog_data.summary \
-          --env prod \
-          --input 'gs://${{ secrets.GCP_STORAGE }}/share-count/service=*/*' \
-          --output gs://${{ secrets.GCP_PROJECT_ID }}/results/output
+          python aggregator/aggregator.py --project ${{ secrets.GCP_PROJECT_ID }} \
+            --runner DataflowRunner \
+            --temp_location gs://${{ secrets.GCP_PROJECT_ID }}/temp \
+            --job_name aggregate \
+            --table ${{ secrets.GCP_PROJECT_ID }}:blog_data.summary \
+            --env prod \
+            --input 'gs://${{ secrets.GCP_STORAGE }}/share-count/service=*/*' \
+            --output gs://${{ secrets.GCP_PROJECT_ID }}/results/output
 
