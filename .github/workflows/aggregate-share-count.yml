@@ -1,8 +1,9 @@
 name: aggregate share count
 
 on:
-  schedule:
-    - cron: '0 1 * * *'
+  push:
+  # schedule:
+  #   - cron: '0 1 * * *'
 
 jobs:
   run-dataflow:
@@ -30,6 +31,7 @@ jobs:
           pip3 install apache-beam[gcp]
           python3 aggregator/aggregator.py --project ${{ secrets.GCP_PROJECT_ID }} \
             --runner DataflowRunner \
+            --region asia-northeast1 \
             --temp_location gs://${{ secrets.GCP_PROJECT_ID }}/temp \
             --job_name aggregate \
             --table ${{ secrets.GCP_PROJECT_ID }}:blog_data.summary \
