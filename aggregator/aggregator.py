@@ -35,12 +35,12 @@ class ExtractService(beam.DoFn):
 
 class ExtractHatena(beam.DoFn):
     def process(self, element):
-        if 'comment' in element:
-            yield pvalue.TaggedOutput('comment', element)
+        if 'timestamp' in element:
+            yield pvalue.TaggedOutput('bookmark', element)
+        elif 'quote' in element:
+            yield pvalue.TaggedOutput('star', element)
         elif 'tag' in element:
             yield pvalue.TaggedOutput('tag', element)
-        elif 'timestamp' in element:
-            yield pvalue.TaggedOutput('bookmark', element)
         elif 'metric' in element:
             yield pvalue.TaggedOutput('summary', element)
 
@@ -127,12 +127,10 @@ def run(argv=None, save_main_session=True):
             | 'FlattenHatenaData' >> beam.Flatten() \
             | 'ExtractHatena' >> beam.ParDo(ExtractHatena()).with_outputs()
 
-        # rows_hatena_bookmark = hatena.bookmark
-        # rows_hatena_tag = hatena.tag
-        # rows_hatena_star = hatena.star
+        flattend_rows = (rows_twitter, rows_pocket, rows_facebook, hatena.summary) \
+            | 'Flatten' >> beam.Flatten()
 
-        result = (rows_twitter, rows_pocket, rows_facebook, hatena.summary) \
-            | 'Flatten' >> beam.Flatten() \
+        result = flattend_rows \
             | 'PairWithUrl' >> beam.Map(lambda x: (x['url'], x)) \
             | 'GroupByUrl' >> beam.GroupByKey() \
             | 'Merge' >> beam.Map(merge_metrics)
@@ -146,7 +144,11 @@ def run(argv=None, save_main_session=True):
                             create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
                             )
         else:
-            result | 'WriteTextToFile' >> WriteToText(known_args.output)
+            hatena.bookmark | 'WriteBookmarkToFile' >> WriteToText(f'{known_args.output}-bookmarks')
+            hatena.tag | 'WriteTagToFile' >> WriteToText(f'{known_args.output}-tag')
+            hatena.star | 'WriteStarToFile' >> WriteToText(f'{known_args.output}-star')
+            flattend_rows | 'WriteRowsToFile' >> WriteToText(f'{known_args.output}-row')
+            result | 'WriteSummaryToFile' >> WriteToText(known_args.output)
 
         p.run().wait_until_finish()
 
