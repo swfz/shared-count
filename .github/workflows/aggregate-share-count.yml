@@ -1,0 +1,32 @@
+name: aggregate share count
+
+on:
+  push:
+
+jobs:
+  run-dataflow:
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+        with:
+          python-version: '3.x'
+          architecture: 'x64'
+
+      - name: Authenticate on GCS
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          project_id: timetracker-272110
+          service_account_email: ${{ secrets.GCP_EMAIL }}
+          service_account_key: ${{ secrets.GCP_KEY }}
+          export_default_credentials: true
+
+      - run: |
+        python aggregator/aggregator.py --project ${{ secrets.GCP_PROJECT_ID }} \
+          --runner DataflowRunner \
+          --temp_location gs://${{ secrets.GCP_PROJECT_ID }}/temp \
+          --job_name aggregate \
+          --table ${{ secrets.GCP_PROJECT_ID }}:blog_data.summary \
+          --env prod \
+          --input 'gs://${{ secrets.GCP_STORAGE }}/share-count/service=*/*' \
+          --output gs://${{ secrets.GCP_PROJECT_ID }}/results/output
+
