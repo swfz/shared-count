@@ -14,7 +14,7 @@
 各種オプションは適宜入力
 
 ```
-python aggregator.py --project memo-000000 --env dev --runner DirectRunner --input 'raw-*.json' --output aggregated.txt --job_name test-aggregate
+python aggregator.py --project memo-000000 --env dev --runner DirectRunner --input './raw-*.json' --output aggregated.txt --job_name test-aggregate
 ```
 
 ### production
