@@ -33,3 +33,7 @@ jobs:
             --input 'gs://${{ secrets.GCP_STORAGE }}/share-count/service=*/*' \
             --output gs://${{ secrets.GCP_PROJECT_ID }}/results/output
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v1
+        if: always()
+
