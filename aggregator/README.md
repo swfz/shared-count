@@ -4,6 +4,19 @@
 ## requirements
 - apache_beam[gcp]
 
+## environment
+
+## Deploy(GitHub Actions)
+
+- secrets
+
+| name | description |
+|:-|:-|
+| GCP_EMAIL | サービスアカウントのメールアドレス |
+| GCP_KEY | サービスアカウントのキー(base64) |
+| GCP_INPUT_STORAGE | eg) data -> バケット名 |
+| GCP_DATAFLOW_STORAGE | eg) hoge -> バケット名 |
+| GCP_PROJECT_ID | eg) hoge-000000 |
 
 ## execution
 

@@ -33,7 +33,7 @@ jobs:
             --region asia-northeast1 \
             --temp_location gs://${{ secrets.GCP_DATAFLOW_STORAGE }}/temp \
             --job_name aggregate \
-            --table ${{ secrets.GCP_PROJECT_ID }}:blog_data.summary \
+            --dataset ${{ secrets.GCP_PROJECT_ID }}:blog_data \
             --env prod \
             --input 'gs://${{ secrets.GCP_INPUT_STORAGE }}/share-count/service=*/*' \
             --output gs://${{ secrets.GCP_DATAFLOW_STORAGE }}/results/output

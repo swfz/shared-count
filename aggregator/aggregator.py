@@ -79,10 +79,10 @@ def run(argv=None, save_main_session=True):
             default='dev',
             help='execution environment.')
     parser.add_argument(
-            '--table',
-            dest='table_spec',
-            default='sample:sample.sample',
-            help='BigQuery. table')
+            '--dataset',
+            dest='dataset',
+            default='sample:sample',
+            help='BigQuery. dataset')
 
     known_args, pipeline_args = parser.parse_known_args(argv)
 
@@ -118,25 +118,25 @@ def run(argv=None, save_main_session=True):
         if(known_args.env == 'prod'):
             result | 'WriteSummaryToGcs' >> WriteToText(known_args.output)
             hatena.bookmark | 'WriteBookmarkToBigQuery' >> beam.io.WriteToBigQuery(
-                            known_args.table_spec,
+                            f'{known_args.dataset}.bookmark',
                             schema=BqSchema.bookmark,
                             write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
                             create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
                             )
             hatena.tag | 'WriteTagToBigQuery' >> beam.io.WriteToBigQuery(
-                            known_args.table_spec,
+                            f'{known_args.dataset}.tag',
                             schema=BqSchema.tag,
                             write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
                             create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
                             )
-            hatena.tag | 'WriteStarToBigQuery' >> beam.io.WriteToBigQuery(
-                            known_args.table_spec,
+            hatena.star | 'WriteStarToBigQuery' >> beam.io.WriteToBigQuery(
+                            f'{known_args.dataset}.star',
                             schema=BqSchema.star,
                             write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
                             create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
                             )
             result | 'WriteSummaryToBigQuery' >> beam.io.WriteToBigQuery(
-                            known_args.table_spec,
+                            f'{known_args.dataset}.summary',
                             schema=BqSchema.summary,
                             write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
                             create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
