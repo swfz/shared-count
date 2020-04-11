@@ -10,7 +10,7 @@ class HatenaSchema:
             }]
     }
 
-    bookmak = {
+    bookmark = {
             'fields': [{
                 'name': 'url', 'type': 'STRING', 'mode': 'REQUIRED'
             }, {
