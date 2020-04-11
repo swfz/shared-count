@@ -141,6 +141,12 @@ def run(argv=None, save_main_session=True):
                             write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
                             create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
                             )
+            flattend_rows | 'WriteRowToBigQuery' >> beam.io.WriteToBigQuery(
+                            f'{known_args.dataset}.row',
+                            schema=BqSchema.row,
+                            write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
+                            create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
+                            )
         else:
             hatena.bookmark | 'WriteBookmarkToFile' >> WriteToText(f'{known_args.output}-bookmarks')
             hatena.tag | 'WriteTagToFile' >> WriteToText(f'{known_args.output}-tag')
