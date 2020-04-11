@@ -119,19 +119,19 @@ def run(argv=None, save_main_session=True):
             result | 'WriteSummaryToGcs' >> WriteToText(known_args.output)
             hatena.bookmark | 'WriteBookmarkToBigQuery' >> beam.io.WriteToBigQuery(
                             f'{known_args.dataset}.bookmark',
-                            schema=BqSchema.bookmark,
+                            schema=HatenaSchema.bookmark,
                             write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
                             create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
                             )
             hatena.tag | 'WriteTagToBigQuery' >> beam.io.WriteToBigQuery(
                             f'{known_args.dataset}.tag',
-                            schema=BqSchema.tag,
+                            schema=HatenaSchema.tag,
                             write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
                             create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
                             )
             hatena.star | 'WriteStarToBigQuery' >> beam.io.WriteToBigQuery(
                             f'{known_args.dataset}.star',
-                            schema=BqSchema.star,
+                            schema=HatenaSchema.star,
                             write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
                             create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
                             )
