@@ -1,9 +1,16 @@
 from pprint import pprint
+import datetime as dt
 
 
 class Transform:
     def parse_hatena(self, element):
-        bookmarks = map(lambda row: dict(row, **{'url': element['requested_url']}), element['bookmarks'])
+        def transform(row):
+            return dict(row, **{
+                'url': element['requested_url'],
+                'timestamp': dt.datetime.strptime(row['timestamp'], '%Y/%m/%d %H:%M').strftime('%Y-%m-%d %H:%M:%S')
+                })
+
+        bookmarks = map(transform, element['bookmarks'])
         comments = len(list(filter(lambda row: row['comment'] != '', element['bookmarks'])))
 
         tags = []
