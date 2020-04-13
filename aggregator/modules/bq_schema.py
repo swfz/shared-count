@@ -28,7 +28,7 @@ class HatenaSchema:
             'fields': [{
                 'name': 'url', 'type': 'STRING', 'mode': 'REQUIRED'
             }, {
-                'name': 'user', 'type': 'STRING', 'mode': 'REQUIRED'
+                'name': 'name', 'type': 'STRING', 'mode': 'REQUIRED'
             }, {
                 'name': 'quote', 'type': 'STRING', 'mode': 'NULLABLE'
             }]
