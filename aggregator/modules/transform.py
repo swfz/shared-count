@@ -67,7 +67,7 @@ class Transform:
                 'url': element['url'],
                 'service': 'pocket',
                 'metric': 'count',
-                'value': element['count']
+                'value': int(element['count'])
                 }
 
     def parse_twitter(self, element):
