@@ -20,7 +20,7 @@ class HatenaSchema:
             }, {
                 'name': 'timestamp', 'type': 'DATETIME', 'mode': 'NULLABLE'
             }, {
-                'name': 'tags', 'type': 'ARRAY<STRING>', 'mode': 'NULLABLE'
+                'name': 'tags', 'type': 'STRING', 'mode': 'REPEATED'
             }]
         }
 
