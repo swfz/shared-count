@@ -15,8 +15,8 @@ from functools import reduce
 from pprint import pprint
 from apache_beam import pvalue
 
-from bq_schema import HatenaSchema, BqSchema
-from transform import Transform
+from modules.bq_schema import HatenaSchema, BqSchema
+from modules.transform import Transform
 
 
 class ExtractService(beam.DoFn):
