@@ -6,9 +6,9 @@
 
 ![text](api_data_collector.png)
 
-### Aggregate Share Count
+### Aggregate Share Count And Timeseries
 
-![text](aggregate_share_count.png)
+![text](aggregate_share_count_and_timeseries.png)
 
 ### Collect Timeseries HatenaStatus
 
