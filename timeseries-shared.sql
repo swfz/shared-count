@@ -8,5 +8,5 @@ SELECT
   SUM(hatena_star) AS hatena_star,
   SUM(hatena_colorstar) AS hatena_colorstar,
   SUM(facebook_share) AS facebook_share
-FROM `memo-272607.blog_data.summary`
+FROM `${GCP_PROJECT_ID}.blog_data.summary`
 
