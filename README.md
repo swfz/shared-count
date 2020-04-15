@@ -10,6 +10,10 @@
 
 ![text](aggregate_share_count.png)
 
+### Collect Timeseries HatenaStatus
+
+![text](collect_timeseries_hatena_status.png)
+
 
 ## directory
 - hatena
@@ -21,6 +25,8 @@
     - 各種functionへのmessage publishする関数
 - aggregator
     - GCS to BQ with dataflow
+- timeseries-hatenastatus
+    - hatenaブログの購読者数、記事数を定点観測
 
 article url * service の単位でシェア数を取得するFunction
 

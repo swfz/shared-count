@@ -38,3 +38,11 @@ with Diagram('Aggregate Share Count'):
 
     gcs_rawdata >> aggregator >> bq
 
+with Diagram('Collect Timeseries Hatena Status'):
+    schedule = Scheduler('cron "2 2 * * *"')
+    pubsub = Pubsub('memo-timeseries-hatenastatus')
+    fn_timeseries_hatenastatus = Functions('timeseriesHatenaStatus')
+    gcs_rawdata = Storage('raw-data')
+
+    schedule >> pubsub >> fn_timeseries_hatenastatus >> gcs_rawdata
+
