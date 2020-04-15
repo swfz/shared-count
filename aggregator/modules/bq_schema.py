@@ -69,3 +69,31 @@ class BqSchema:
                 'name': 'value', 'type': 'INT64', 'mode': 'NULLABLE'
             }]
         }
+
+    daily_kpi = {
+            'fields': [{
+                'name': 'date', 'type': 'DATE', 'mode': 'REQUIRED'
+            }, {
+                'name': 'url', 'type': 'STRING', 'mode': 'NULLABLE'
+            }, {
+                'name': 'twitter_shared', 'type': 'INT64', 'mode': 'NULLABLE'
+            }, {
+                'name': 'twitter_likes', 'type': 'INT64', 'mode': 'NULLABLE'
+            }, {
+                'name': 'pocket_count', 'type': 'INT64', 'mode': 'NULLABLE'
+            }, {
+                'name': 'hatena_bookmark', 'type': 'INT64', 'mode': 'NULLABLE'
+            }, {
+                'name': 'hatena_comments', 'type': 'INT64', 'mode': 'NULLABLE'
+            }, {
+                'name': 'hatena_star', 'type': 'INT64', 'mode': 'NULLABLE'
+            }, {
+                'name': 'hatena_colorstar', 'type': 'INT64', 'mode': 'NULLABLE'
+            }, {
+                'name': 'facebook_share', 'type': 'INT64', 'mode': 'NULLABLE'
+            }, {
+                'name': 'subscribers', 'type': 'INT64', 'mode': 'NULLABLE'
+            }, {
+                'name': 'entries', 'type': 'INT64', 'mode': 'NULLABLE'
+            }]
+        }

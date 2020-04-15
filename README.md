@@ -6,9 +6,9 @@
 
 ![text](api_data_collector.png)
 
-### Aggregate Share Count
+### Aggregate Share Count And Timeseries
 
-![text](aggregate_share_count.png)
+![text](aggregate_share_count_and_timeseries.png)
 
 ### Collect Timeseries HatenaStatus
 
@@ -25,6 +25,8 @@
     - 各種functionへのmessage publishする関数
 - aggregator
     - GCS to BQ with dataflow
+        - aggregator.py 各種サービスのシェアカウントをサマリーしBQへ
+        - timeseries.py 各種時系列データをサマリーしBQへ
 - timeseries-hatenastatus
     - hatenaブログの購読者数、記事数を定点観測
 

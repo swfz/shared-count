@@ -1,0 +1,42 @@
+name: aggregate timeseries
+
+on:
+  schedule:
+    - cron: '0 5 * * *'
+
+jobs:
+  run-dataflow:
+    runs-on: ubuntu-latest
+    name: aggregate timeseries data
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+        with:
+          python-version: '3.7'
+          architecture: 'x64'
+
+      - name: Authenticate on GCS
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_email: ${{ secrets.GCP_EMAIL }}
+          service_account_key: ${{ secrets.GCP_KEY }}
+          export_default_credentials: true
+
+      - run: |
+          pip3 install --upgrade virtualenv --user
+          python3 -m virtualenv env
+          source env/bin/activate
+          pip3 install apache-beam[gcp]
+          cd aggregator
+          python3 timeseries.py --project ${{ secrets.GCP_PROJECT_ID }} \
+            --setup_file ./setup.py \
+            --runner DataflowRunner \
+            --region asia-northeast1 \
+            --temp_location gs://${{ secrets.GCP_DATAFLOW_STORAGE }}/temp \
+            --job_name aggregate-timeseries \
+            --dataset ${{ secrets.GCP_PROJECT_ID }}:blog_data \
+            --env prod \
+            --input 'gs://${{ secrets.GCP_INPUT_STORAGE }}/timeseries/service=*/*' \
+            --output gs://${{ secrets.GCP_DATAFLOW_STORAGE }}/results/output-timeseries
+

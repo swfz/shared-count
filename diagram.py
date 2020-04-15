@@ -31,7 +31,7 @@ with Diagram('API Data Collector'):
     fn_publish >> pubsub_pocket >> fn_pocket >> gcs_rawdata
     fn_publish >> pubsub_twitter >> fn_twitter >> gcs_rawdata
 
-with Diagram('Aggregate Share Count'):
+with Diagram('Aggregate Share Count And Timeseries'):
     gcs_rawdata = Storage('raw-data')
     aggregator = Dataflow('aggregator')
     bq = Bigquery('blog_data.summary')
