@@ -1,0 +1,27 @@
+name: timeseries metric
+on:
+  schedule:
+    - cron: '0 4 * * *'
+
+jobs:
+  plot-daily-metrics:
+    runs-on: ubuntu-latest
+    name: plot daily data
+    steps:
+      - uses: actions/checkout@v2
+      - name: Authenticate on GCS
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_email: ${{ secrets.GCP_EMAIL }}
+          service_account_key: ${{ secrets.GCP_KEY }}
+          export_default_credentials: true
+
+      - name: plot total value in shared count metrics
+        env:
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+        run: |
+          cat timeseries-shared.sql | envsubst > /tmp/timeseries-shared.sql
+          d=$(date +"%Y-%m-%d")
+          bq query --project_id=${{ secrets.GCP_PROJECT_ID }} --format json < /tmp/timeseries-shared.sql | jq -cr '.[]' > /tmp/${d}.json
+          gsutil cp /tmp/${d}.json gs://${{ secrets.GCP_INPUT_STORAGE }}/timeseries/service=sns/${d}.json
