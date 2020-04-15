@@ -18,7 +18,7 @@ jobs:
       - name: Authenticate on GCS
         uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
         with:
-          project_id: timetracker-272110
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_email: ${{ secrets.GCP_EMAIL }}
           service_account_key: ${{ secrets.GCP_KEY }}
           export_default_credentials: true
