@@ -23,5 +23,6 @@ jobs:
         run: |
           cat timeseries-shared.sql | envsubst > /tmp/timeseries-shared.sql
           d=$(date +"%Y-%m-%d")
+          bq query --project_id=${{ secrets.GCP_PROJECT_ID }} --format json < /tmp/timeseries-shared.sql
           bq query --project_id=${{ secrets.GCP_PROJECT_ID }} --format json < /tmp/timeseries-shared.sql | jq -cr --arg date ${d} '.[]|.date|=$date' > /tmp/${d}.json
           gsutil cp /tmp/${d}.json gs://${{ secrets.GCP_INPUT_STORAGE }}/timeseries/service=sns/${d}.json
