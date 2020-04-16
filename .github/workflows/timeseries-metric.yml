@@ -1,6 +1,5 @@
 name: timeseries metric
 on:
-  push:
   schedule:
     - cron: '0 4 * * *'
 
