@@ -64,7 +64,7 @@ const requestReport = async (viewId) => {
 
   return {
     last7days: last7DaysRes.data,
-    last30Days: last30DaysRes.data,
+    last30days: last30DaysRes.data,
     total: totalRes.data
   };
 };
