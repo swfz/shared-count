@@ -14,6 +14,11 @@
 
 ![text](collect_timeseries_hatena_status.png)
 
+### Collect Analytics Report
+
+![text](collect_analytics_report.png)
+
+
 
 ## directory
 - hatena
@@ -21,6 +26,8 @@
 - facebook
 - pocket
 - twitter
+- analytics
+    - 過去7日、30日トータルのPath毎PV数
 - publisher
     - 各種functionへのmessage publishする関数
 - aggregator
