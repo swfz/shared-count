@@ -46,3 +46,11 @@ with Diagram('Collect Timeseries Hatena Status'):
 
     schedule >> pubsub >> fn_timeseries_hatenastatus >> gcs_rawdata
 
+with Diagram('Collect Analytics Report'):
+    schedule = Scheduler('cron "1 1 * * *"')
+    pubsub = Pubsub('memo-collector-analytics')
+    fn_analytics = Functions('collectAnalyticsReport')
+    gcs_rawdata = Storage('raw-data')
+
+    schedule >> pubsub >> fn_analytics >> gcs_rawdata
+

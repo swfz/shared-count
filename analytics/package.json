@@ -1,0 +1,21 @@
+{
+  "name": "shared-count-analytics",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "functions-framework --target=collectAnalyticsReport --signature-type=event",
+    "deploy": "gcloud functions deploy collectAnalyticsReport --trigger-topic=memo-collector-analytics --runtime nodejs10 --region asia-northeast1 --set-env-vars BUCKET=memo-raw-data",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@google-cloud/functions-framework": "^1.5.1"
+  },
+  "dependencies": {
+    "@google-cloud/storage": "^4.7.0",
+    "googleapis": "^49.0.0",
+    "moment": "^2.24.0"
+  }
+}
