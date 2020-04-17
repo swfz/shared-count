@@ -6,9 +6,10 @@ from functools import reduce
 
 class Transform:
     def parse_hatena(self, element):
+        url = re.sub(r'^http[s]?', '', element['requested_url'])
         def transform(row):
             return dict(row, **{
-                'url': element['requested_url'],
+                'url': url,
                 'timestamp': dt.datetime.strptime(row['timestamp'], '%Y/%m/%d %H:%M').strftime('%Y-%m-%d %H:%M:%S')
             })
 
@@ -20,18 +21,18 @@ class Transform:
         for b in element['bookmarks']:
             for t in b['tags']:
                 tags.append({
-                    'url': element['requested_url'],
+                    'url': url,
                     'user': b['user'],
                     'tag': t
                 })
 
         summary = [{
-            'url': element['requested_url'],
+            'url': url,
             'service': 'hatena',
             'metric': 'bookmark',
             'value': element['count']
         }, {
-            'url': element['requested_url'],
+            'url': url,
             'service': 'hatena',
             'metric': 'comments',
             'value': comments
@@ -40,7 +41,7 @@ class Transform:
         return list(bookmarks) + tags + summary
 
     def parse_hatena_star(self, element):
-        url = element['entries'][0]['uri']
+        url = re.sub(r'^http[s]?', '', element['entries'][0]['uri'])
 
         stars = map(lambda row: dict(row, **{'url': url}), element['entries'][0]['stars'])
 
@@ -62,31 +63,34 @@ class Transform:
         return list(stars) + summary
 
     def parse_facebook(self, element):
+        url = re.sub(r'^http[s]?', '', element['id'])
         value = element['og_object']['engagement']['count'] if 'og_object' in element else 0
 
         return {
-            'url': element['id'],
+            'url': url,
             'service': 'facebook',
             'metric': 'share',
             'value': value
         }
 
     def parse_pocket(self, element):
+        url = re.sub(r'^http[s]?', '', element['url'])
         return {
-            'url': element['url'],
+            'url': url,
             'service': 'pocket',
             'metric': 'count',
             'value': int(element['count'])
         }
 
     def parse_twitter(self, element):
+        url = re.sub(r'^http[s]?', '', element['url'])
         return [{
-            'url': element['url'],
+            'url': url,
             'service': 'twitter',
             'metric': 'shared',
             'value': element['count'],
         }, {
-            'url': element['url'],
+            'url': url,
             'service': 'twitter',
             'metric': 'likes',
             'value': element['likes'],
