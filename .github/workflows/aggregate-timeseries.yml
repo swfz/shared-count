@@ -1,6 +1,7 @@
 name: aggregate timeseries
 
 on:
+  push:
   schedule:
     - cron: '0 5 * * *'
 
