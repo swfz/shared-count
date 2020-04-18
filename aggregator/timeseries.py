@@ -19,7 +19,6 @@ from modules.bq_schema import HatenaSchema, BqSchema
 from modules.transform import Transform
 
 def merge_metrics(tpl):
-    pprint('merge_metrics')
     key, values = tpl
 
     row = {'date': key}
@@ -31,7 +30,6 @@ def merge_metrics(tpl):
 
 
 def run(argv=None, save_main_session=True):
-    pprint('run')
     parser = argparse.ArgumentParser()
     parser.add_argument(
             '--input',
@@ -61,7 +59,6 @@ def run(argv=None, save_main_session=True):
     pipeline_options.view_as(SetupOptions).save_main_session = save_main_session
 
     p = beam.Pipeline(options=pipeline_options)
-    pprint('with')
 
     result = p | 'READ' >> ReadFromText(known_args.input) \
                | 'ParseJson' >> beam.Map(lambda x: json.loads(x)) \
@@ -81,12 +78,9 @@ def run(argv=None, save_main_session=True):
                         )
 
     else:
-        pprint('output')
         result | 'WriteSummaryToFile' >> WriteToText(known_args.output)
 
     p.run().wait_until_finish()
-    pprint('after run')
-
     pprint(vars(result))
 
 
