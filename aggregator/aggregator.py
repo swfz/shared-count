@@ -6,6 +6,7 @@ import apache_beam as beam
 import argparse
 import logging
 import json
+import re
 
 from apache_beam.options.pipeline_options import PipelineOptions
 from apache_beam.options.pipeline_options import SetupOptions
@@ -31,6 +32,8 @@ class ExtractService(beam.DoFn):
             yield pvalue.TaggedOutput('pocket', element)
         elif 'og_object' in element:
             yield pvalue.TaggedOutput('facebook', element)
+        elif 'last7days' in element:
+            yield pvalue.TaggedOutput('analytics', element)
 
 
 class ExtractHatena(beam.DoFn):
@@ -100,6 +103,7 @@ def run(argv=None, save_main_session=True):
     rows_twitter = mixed_data.twitter | beam.FlatMap(Transform().parse_twitter)
     rows_pocket = mixed_data.pocket | beam.Map(Transform().parse_pocket)
     rows_facebook = mixed_data.facebook | beam.Map(Transform().parse_facebook)
+    rows_analytics = mixed_data.analytics | beam.FlatMap(Transform().parse_analytics)
 
     mixed_hatena = mixed_data.hatena | beam.FlatMap(Transform().parse_hatena)
     mixed_hatenastar = mixed_data.hatenastar | beam.FlatMap(Transform().parse_hatena_star)
@@ -108,11 +112,11 @@ def run(argv=None, save_main_session=True):
         | 'FlattenHatenaData' >> beam.Flatten() \
         | 'ExtractHatena' >> beam.ParDo(ExtractHatena()).with_outputs()
 
-    flattend_rows = (rows_twitter, rows_pocket, rows_facebook, hatena.summary) \
+    flattend_rows = (rows_twitter, rows_pocket, rows_facebook, hatena.summary, rows_analytics) \
         | 'Flatten' >> beam.Flatten()
 
     result = flattend_rows \
-        | 'PairWithUrl' >> beam.Map(lambda x: (x['url'], x)) \
+        | 'PairWithUrl' >> beam.Map(lambda x: (re.sub(r'^http[s]?', '', x['url']), x)) \
         | 'GroupByUrl' >> beam.GroupByKey() \
         | 'Merge' >> beam.Map(merge_metrics)
 
