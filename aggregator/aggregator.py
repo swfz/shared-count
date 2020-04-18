@@ -92,75 +92,76 @@ def run(argv=None, save_main_session=True):
     pprint(known_args.input)
     pipeline_options = PipelineOptions(pipeline_args)
     pipeline_options.view_as(SetupOptions).save_main_session = save_main_session
-    with beam.Pipeline(options=pipeline_options) as p:
 
-        mixed_data = p | 'READ' >> ReadFromText(known_args.input) \
-                       | 'ParseJson' >> beam.Map(lambda x: json.loads(x)) \
-                       | 'ExcludeNone' >> beam.Filter(lambda e: e is not None) \
-                       | 'DivideService' >> beam.ParDo(ExtractService()).with_outputs()
+    p = beam.Pipeline(options=pipeline_options)
 
-        rows_twitter = mixed_data.twitter | beam.FlatMap(Transform().parse_twitter)
-        rows_pocket = mixed_data.pocket | beam.Map(Transform().parse_pocket)
-        rows_facebook = mixed_data.facebook | beam.Map(Transform().parse_facebook)
-        rows_analytics = mixed_data.analytics | beam.FlatMap(Transform().parse_analytics)
+    mixed_data = p | 'READ' >> ReadFromText(known_args.input) \
+                   | 'ParseJson' >> beam.Map(lambda x: json.loads(x)) \
+                   | 'ExcludeNone' >> beam.Filter(lambda e: e is not None) \
+                   | 'DivideService' >> beam.ParDo(ExtractService()).with_outputs()
 
-        mixed_hatena = mixed_data.hatena | beam.FlatMap(Transform().parse_hatena)
-        mixed_hatenastar = mixed_data.hatenastar | beam.FlatMap(Transform().parse_hatena_star)
+    rows_twitter = mixed_data.twitter | beam.FlatMap(Transform().parse_twitter)
+    rows_pocket = mixed_data.pocket | beam.Map(Transform().parse_pocket)
+    rows_facebook = mixed_data.facebook | beam.Map(Transform().parse_facebook)
+    rows_analytics = mixed_data.analytics | beam.FlatMap(Transform().parse_analytics)
 
-        hatena = (mixed_hatena, mixed_hatenastar) \
-            | 'FlattenHatenaData' >> beam.Flatten() \
-            | 'ExtractHatena' >> beam.ParDo(ExtractHatena()).with_outputs()
+    mixed_hatena = mixed_data.hatena | beam.FlatMap(Transform().parse_hatena)
+    mixed_hatenastar = mixed_data.hatenastar | beam.FlatMap(Transform().parse_hatena_star)
 
-        flattend_rows = (rows_twitter, rows_pocket, rows_facebook, hatena.summary, rows_analytics) \
-            | 'Flatten' >> beam.Flatten()
+    hatena = (mixed_hatena, mixed_hatenastar) \
+        | 'FlattenHatenaData' >> beam.Flatten() \
+        | 'ExtractHatena' >> beam.ParDo(ExtractHatena()).with_outputs()
 
-        result = flattend_rows \
-            | 'PairWithUrl' >> beam.Map(lambda x: (re.sub(r'^http[s]?', '', x['url']), x)) \
-            | 'GroupByUrl' >> beam.GroupByKey() \
-            | 'Merge' >> beam.Map(merge_metrics)
+    flattend_rows = (rows_twitter, rows_pocket, rows_facebook, hatena.summary, rows_analytics) \
+        | 'Flatten' >> beam.Flatten()
 
-        if(known_args.env == 'prod'):
-            result | 'WriteSummaryToGcs' >> WriteToText(known_args.output)
-            hatena.bookmark | 'WriteBookmarkToBigQuery' >> beam.io.WriteToBigQuery(
-                            f'{known_args.dataset}.bookmark',
-                            schema=HatenaSchema.bookmark,
-                            write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
-                            create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
-                            )
-            hatena.tag | 'WriteTagToBigQuery' >> beam.io.WriteToBigQuery(
-                            f'{known_args.dataset}.tag',
-                            schema=HatenaSchema.tag,
-                            write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
-                            create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
-                            )
-            hatena.star | 'WriteStarToBigQuery' >> beam.io.WriteToBigQuery(
-                            f'{known_args.dataset}.star',
-                            schema=HatenaSchema.star,
-                            write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
-                            create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
-                            )
-            result | 'WriteSummaryToBigQuery' >> beam.io.WriteToBigQuery(
-                            f'{known_args.dataset}.summary',
-                            schema=BqSchema.summary,
-                            write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
-                            create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
-                            )
-            flattend_rows | 'WriteRowToBigQuery' >> beam.io.WriteToBigQuery(
-                            f'{known_args.dataset}.row',
-                            schema=BqSchema.row,
-                            write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
-                            create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
-                            )
-        else:
-            hatena.bookmark | 'WriteBookmarkToFile' >> WriteToText(f'{known_args.output}-bookmarks')
-            hatena.tag | 'WriteTagToFile' >> WriteToText(f'{known_args.output}-tag')
-            hatena.star | 'WriteStarToFile' >> WriteToText(f'{known_args.output}-star')
-            flattend_rows | 'WriteRowsToFile' >> WriteToText(f'{known_args.output}-row')
-            result | 'WriteSummaryToFile' >> WriteToText(known_args.output)
+    result = flattend_rows \
+        | 'PairWithUrl' >> beam.Map(lambda x: (re.sub(r'^http[s]?', '', x['url']), x)) \
+        | 'GroupByUrl' >> beam.GroupByKey() \
+        | 'Merge' >> beam.Map(merge_metrics)
 
-        p.run().wait_until_finish()
+    if(known_args.env == 'prod'):
+        result | 'WriteSummaryToGcs' >> WriteToText(known_args.output)
+        hatena.bookmark | 'WriteBookmarkToBigQuery' >> beam.io.WriteToBigQuery(
+                        f'{known_args.dataset}.bookmark',
+                        schema=HatenaSchema.bookmark,
+                        write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
+                        create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
+                        )
+        hatena.tag | 'WriteTagToBigQuery' >> beam.io.WriteToBigQuery(
+                        f'{known_args.dataset}.tag',
+                        schema=HatenaSchema.tag,
+                        write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
+                        create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
+                        )
+        hatena.star | 'WriteStarToBigQuery' >> beam.io.WriteToBigQuery(
+                        f'{known_args.dataset}.star',
+                        schema=HatenaSchema.star,
+                        write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
+                        create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
+                        )
+        result | 'WriteSummaryToBigQuery' >> beam.io.WriteToBigQuery(
+                        f'{known_args.dataset}.summary',
+                        schema=BqSchema.summary,
+                        write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
+                        create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
+                        )
+        flattend_rows | 'WriteRowToBigQuery' >> beam.io.WriteToBigQuery(
+                        f'{known_args.dataset}.row',
+                        schema=BqSchema.row,
+                        write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
+                        create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
+                        )
+    else:
+        hatena.bookmark | 'WriteBookmarkToFile' >> WriteToText(f'{known_args.output}-bookmarks')
+        hatena.tag | 'WriteTagToFile' >> WriteToText(f'{known_args.output}-tag')
+        hatena.star | 'WriteStarToFile' >> WriteToText(f'{known_args.output}-star')
+        flattend_rows | 'WriteRowsToFile' >> WriteToText(f'{known_args.output}-row')
+        result | 'WriteSummaryToFile' >> WriteToText(known_args.output)
 
-        pprint(vars(result))
+    p.run().wait_until_finish()
+
+    pprint(vars(result))
 
 
 if __name__ == '__main__':
