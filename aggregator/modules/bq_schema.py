@@ -101,5 +101,11 @@ class BqSchema:
                 'name': 'subscribers', 'type': 'INT64', 'mode': 'NULLABLE'
             }, {
                 'name': 'entries', 'type': 'INT64', 'mode': 'NULLABLE'
+            }, {
+                'name': 'analytics_last7days', 'type': 'INT64', 'mode': 'NULLABLE'
+            }, {
+                'name': 'analytics_last30days', 'type': 'INT64', 'mode': 'NULLABLE'
+            }, {
+                'name': 'analytics_total', 'type': 'INT64', 'mode': 'NULLABLE'
             }]
         }
