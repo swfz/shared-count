@@ -57,31 +57,31 @@ def run(argv=None, save_main_session=True):
     pprint(known_args.input)
     pipeline_options = PipelineOptions(pipeline_args)
     pipeline_options.view_as(SetupOptions).save_main_session = save_main_session
-    with beam.Pipeline(options=pipeline_options) as p:
 
-        result = p | 'READ' >> ReadFromText(known_args.input) \
-                   | 'ParseJson' >> beam.Map(lambda x: json.loads(x)) \
-                   | 'ExcludeNone' >> beam.Filter(lambda e: e is not None) \
-                   | 'PairWithDate' >> beam.Map(lambda x: (x['date'], x)) \
-                   | 'GroupByDate' >> beam.GroupByKey() \
-                   | 'Merge' >> beam.Map(merge_metrics)
+    p = beam.Pipeline(options=pipeline_options)
+
+    result = p | 'READ' >> ReadFromText(known_args.input) \
+               | 'ParseJson' >> beam.Map(lambda x: json.loads(x)) \
+               | 'ExcludeNone' >> beam.Filter(lambda e: e is not None) \
+               | 'PairWithDate' >> beam.Map(lambda x: (x['date'], x)) \
+               | 'GroupByDate' >> beam.GroupByKey() \
+               | 'Merge' >> beam.Map(merge_metrics)
 
 
-        if(known_args.env == 'prod'):
-            result | 'WriteSummaryToGcs' >> WriteToText(known_args.output)
-            result | 'WriteSummaryToBigQuery' >> beam.io.WriteToBigQuery(
-                            f'{known_args.dataset}.daily_kpi',
-                            schema=BqSchema.daily_kpi,
-                            write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
-                            create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
-                            )
+    if(known_args.env == 'prod'):
+        result | 'WriteSummaryToGcs' >> WriteToText(known_args.output)
+        result | 'WriteSummaryToBigQuery' >> beam.io.WriteToBigQuery(
+                        f'{known_args.dataset}.daily_kpi',
+                        schema=BqSchema.daily_kpi,
+                        write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
+                        create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
+                        )
 
-        else:
-            result | 'WriteSummaryToFile' >> WriteToText(known_args.output)
+    else:
+        result | 'WriteSummaryToFile' >> WriteToText(known_args.output)
 
-        p.run().wait_until_finish()
-
-        pprint(vars(result))
+    p.run().wait_until_finish()
+    pprint(vars(result))
 
 
 if __name__ == '__main__':
