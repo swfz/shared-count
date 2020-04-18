@@ -6,10 +6,12 @@ from functools import reduce
 
 class Transform:
     def parse_hatena(self, element):
-        url = re.sub(r'^http[s]?', '', element['requested_url'])
+        url = element['requested_url']
+        hier_part= re.sub(r'^http[s]?', '', url)
         def transform(row):
             return dict(row, **{
                 'url': url,
+                'hier_part': hier_part,
                 'timestamp': dt.datetime.strptime(row['timestamp'], '%Y/%m/%d %H:%M').strftime('%Y-%m-%d %H:%M:%S')
             })
 
@@ -22,17 +24,20 @@ class Transform:
             for t in b['tags']:
                 tags.append({
                     'url': url,
+                    'hier_part': hier_part,
                     'user': b['user'],
                     'tag': t
                 })
 
         summary = [{
             'url': url,
+            'hier_part': hier_part,
             'service': 'hatena',
             'metric': 'bookmark',
             'value': element['count']
         }, {
             'url': url,
+            'hier_part': hier_part,
             'service': 'hatena',
             'metric': 'comments',
             'value': comments
@@ -41,20 +46,23 @@ class Transform:
         return list(bookmarks) + tags + summary
 
     def parse_hatena_star(self, element):
-        url = re.sub(r'^http[s]?', '', element['entries'][0]['uri'])
+        url = element['entries'][0]['uri']
+        hier_part = re.sub(r'^http[s]?', '', url)
 
-        stars = map(lambda row: dict(row, **{'url': url}), element['entries'][0]['stars'])
+        stars = map(lambda row: dict(row, **{'url': url, 'hier_part': hier_part}), element['entries'][0]['stars'])
 
         star = len(element['entries'][0]['stars']) if 'stars' in element['entries'][0] else 0
         colored = len(element['entries'][0]['colored_stars']) if 'colored_stars' in element['entries'][0] else 0
 
         summary = [{
             'url': url,
+            'hier_part': hier_part,
             'service': 'hatena',
             'metric': 'star',
             'value': star,
         }, {
             'url': url,
+            'hier_part': hier_part,
             'service': 'hatena',
             'metric': 'colorstar',
             'value': colored,
@@ -63,34 +71,41 @@ class Transform:
         return list(stars) + summary
 
     def parse_facebook(self, element):
-        url = re.sub(r'^http[s]?', '', element['id'])
+        url = element['id']
+        hier_part = re.sub(r'^http[s]?', '', url)
         value = element['og_object']['engagement']['count'] if 'og_object' in element else 0
 
         return {
             'url': url,
+            'hier_part': hier_part,
             'service': 'facebook',
             'metric': 'share',
             'value': value
         }
 
     def parse_pocket(self, element):
-        url = re.sub(r'^http[s]?', '', element['url'])
+        url = element['url']
+        hier_part = re.sub(r'^http[s]?', '', url)
         return {
             'url': url,
+            'hier_part': hier_part,
             'service': 'pocket',
             'metric': 'count',
             'value': int(element['count'])
         }
 
     def parse_twitter(self, element):
-        url = re.sub(r'^http[s]?', '', element['url'])
+        url = element['url']
+        hier_part = re.sub(r'^http[s]?', '', url)
         return [{
             'url': url,
+            'hier_part': hier_part,
             'service': 'twitter',
             'metric': 'shared',
             'value': element['count'],
         }, {
             'url': url,
+            'hier_part': hier_part,
             'service': 'twitter',
             'metric': 'likes',
             'value': element['likes'],
@@ -101,7 +116,7 @@ class Transform:
 
         def transform(row):
             return {
-                'url': domain + roundPath(row['dimensions'][0]),
+                'hier_part': domain + roundPath(row['dimensions'][0]),
                 'value': int(row['metrics'][0]['values'][0]),
             }
 
@@ -110,13 +125,13 @@ class Transform:
 
         def merge_row(acc, row):
             transformed = transform(row)
-            key = transformed['url']
+            key = transformed['hier_part']
 
             if key in acc:
                 value = acc[key]['value'] + transformed['value']
                 acc[key].update({'value': value})
             else:
-                acc[key] = {'url': key, 'value': transformed['value']}
+                acc[key] = {'hier_part': key, 'value': transformed['value']}
 
             return acc
 
