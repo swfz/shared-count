@@ -51,7 +51,7 @@ class ExtractHatena(beam.DoFn):
 def merge_metrics(tpl):
     key, values = tpl
 
-    row = {'url': key}
+    row = {'hier_part': key}
 
     def calc(acc, cur):
         key = cur['service'] + '_' + cur['metric']
@@ -116,7 +116,7 @@ def run(argv=None, save_main_session=True):
         | 'Flatten' >> beam.Flatten()
 
     result = flattend_rows \
-        | 'PairWithUrl' >> beam.Map(lambda x: (re.sub(r'^http[s]?', '', x['url']), x)) \
+        | 'PairWithUrl' >> beam.Map(lambda x: (x['hier_part'], x)) \
         | 'GroupByUrl' >> beam.GroupByKey() \
         | 'Merge' >> beam.Map(merge_metrics)
 

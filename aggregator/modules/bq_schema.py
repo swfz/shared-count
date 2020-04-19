@@ -4,6 +4,8 @@ class HatenaSchema:
             'fields': [{
                 'name': 'url', 'type': 'STRING', 'mode': 'REQUIRED'
             }, {
+                'name': 'hier_part', 'type': 'STRING', 'mode': 'REQUIRED'
+            }, {
                 'name': 'user', 'type': 'STRING', 'mode': 'REQUIRED'
             }, {
                 'name': 'tag', 'type': 'STRING', 'mode': 'NULLABLE'
@@ -13,6 +15,8 @@ class HatenaSchema:
     bookmark = {
             'fields': [{
                 'name': 'url', 'type': 'STRING', 'mode': 'REQUIRED'
+            }, {
+                'name': 'hier_part', 'type': 'STRING', 'mode': 'REQUIRED'
             }, {
                 'name': 'user', 'type': 'STRING', 'mode': 'REQUIRED'
             }, {
@@ -28,6 +32,8 @@ class HatenaSchema:
             'fields': [{
                 'name': 'url', 'type': 'STRING', 'mode': 'REQUIRED'
             }, {
+                'name': 'hier_part', 'type': 'STRING', 'mode': 'REQUIRED'
+            }, {
                 'name': 'name', 'type': 'STRING', 'mode': 'REQUIRED'
             }, {
                 'name': 'quote', 'type': 'STRING', 'mode': 'NULLABLE'
@@ -38,7 +44,7 @@ class HatenaSchema:
 class BqSchema:
     summary = {
             'fields': [{
-                'name': 'url', 'type': 'STRING', 'mode': 'REQUIRED'
+                'name': 'hier_part', 'type': 'STRING', 'mode': 'REQUIRED'
             }, {
                 'name': 'twitter_shared', 'type': 'INT64', 'mode': 'NULLABLE'
             }, {
@@ -66,7 +72,9 @@ class BqSchema:
 
     row = {
             'fields': [{
-                'name': 'url', 'type': 'STRING', 'mode': 'REQUIRED'
+                'name': 'url', 'type': 'STRING', 'mode': 'NULLABLE'
+            }, {
+                'name': 'hier_part', 'type': 'STRING', 'mode': 'REQUIRED'
             }, {
                 'name': 'service', 'type': 'STRING', 'mode': 'REQUIRED'
             }, {
