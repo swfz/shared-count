@@ -1,0 +1,22 @@
+name: aggregator io test
+
+on: [push]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: input output test
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+        with:
+          python-version: '3.7'
+          architecture: 'x64'
+      - run: |
+          pip3 install --upgrade virtualenv --user
+          python3 -m virtualenv env
+          source env/bin/activate
+          pip3 install apache-beam[gcp]
+          cd aggregator
+          python3 aggregator_test.py
+

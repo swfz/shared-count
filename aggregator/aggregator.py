@@ -157,7 +157,7 @@ def run(argv=None, save_main_session=True):
         hatena.tag | 'WriteTagToFile' >> WriteToText(f'{known_args.output}-tag')
         hatena.star | 'WriteStarToFile' >> WriteToText(f'{known_args.output}-star')
         flattend_rows | 'WriteRowsToFile' >> WriteToText(f'{known_args.output}-row')
-        result | 'WriteSummaryToFile' >> WriteToText(known_args.output)
+        result | 'WriteSummaryToFile' >> WriteToText(f'{known_args.output}-summary')
 
     p.run().wait_until_finish()
 
