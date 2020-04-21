@@ -4,6 +4,7 @@ import logging
 import glob
 import re
 import json
+import datetime as dt
 from pprint import pprint
 from aggregator import run
 from apache_beam.testing.util import open_shards
@@ -18,7 +19,8 @@ class AggregatorTest(unittest.TestCase):
                 '://example.com/entry/2': {'hier_part': '://example.com/entry/2'}
             },
             'row': [],
-            'tag': []
+            'bookmarks': [],
+            'tag': [],
         }
 
         def to_hier_part(url):
@@ -79,6 +81,8 @@ class AggregatorTest(unittest.TestCase):
                     cls.aggregated['row'].append(comments)
 
                     for b in row['bookmarks']:
+                        bookmark = dict(b, **{'url': row['url'], 'hier_part': hier_part, 'timestamp': dt.datetime.strptime(b['timestamp'], '%Y/%m/%d %H:%M').strftime('%Y-%m-%d %H:%M:%S')})
+                        cls.aggregated['bookmarks'].append(bookmark)
                         for tag in b['tags']:
                             t = {'url': row['url'], 'hier_part': hier_part, 'user': b['user'], 'tag': tag}
                             cls.aggregated['tag'].append(t)
@@ -114,6 +118,17 @@ class AggregatorTest(unittest.TestCase):
                 self.assertEqual(
                     sorted(lines, key=lambda x: (x['hier_part'], x['metric'])),
                     sorted(self.aggregated['row'], key=lambda x: (x['hier_part'], x['metric']))
+                )
+
+        with open_shards('./sample_output/' + 'output.result-bookmarks-*-of-*') as result_file:
+            lines = []
+            for line in result_file:
+                lines.append(eval(line))
+            pprint(self.aggregated['bookmarks'])
+            with self.subTest(type='bookmarks'):
+                self.assertEqual(
+                    sorted(lines, key=lambda x: (x['hier_part'], x['timestamp'])),
+                    sorted(self.aggregated['bookmarks'], key=lambda x: (x['hier_part'], x['timestamp']))
                 )
 
         with open_shards('./sample_output/' + 'output.result-tag-*-of-*') as result_file:
