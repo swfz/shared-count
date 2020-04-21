@@ -5,6 +5,7 @@ import glob
 import re
 import json
 import datetime as dt
+from functools import reduce
 from pprint import pprint
 from aggregator import run
 from apache_beam.testing.util import open_shards
@@ -16,7 +17,8 @@ class AggregatorTest(unittest.TestCase):
         cls.aggregated = {
             'summary': {
                 '://example.com/entry/1': {'hier_part': '://example.com/entry/1'},
-                '://example.com/entry/2': {'hier_part': '://example.com/entry/2'}
+                '://example.com/entry/2': {'hier_part': '://example.com/entry/2'},
+                '://example.com/': {'hier_part': '://example.com/'} # analyticsでは定形のURL以外の形式で入ってくることもる
             },
             'row': [],
             'bookmarks': [],
@@ -158,6 +160,79 @@ class AggregatorTest(unittest.TestCase):
                     }
                     cls.aggregated['row'].append(count)
 
+        a_files = glob.glob('./sample_input/raw-analytics-basic*.json')
+        for filename in a_files:
+            with open(filename) as file:
+                for line in file:
+                    report = json.loads(line)
+
+                    last7days = report['last7days']['reports'][0]['data']['rows']
+                    for r in last7days:
+                        hier_part = '://example.com' + re.sub(r'\?.*', '', r['dimensions'][0])
+                        v = int(r['metrics'][0]['values'][0])
+                        row = {
+                            'hier_part': hier_part,
+                            'service': 'analytics',
+                            'metric': 'last7days',
+                            'value': v
+                        }
+
+                        index = next((index for (index, d) in enumerate(cls.aggregated['row']) if d['hier_part'] == hier_part and d['service'] == 'analytics' and d['metric'] == 'last7days'), None)
+                        if not index is None:
+                            cls.aggregated['row'][index]['value'] = cls.aggregated['row'][index]['value'] + v
+                        else:
+                            cls.aggregated['row'].append(row)
+
+                        if 'analytics_last7days' in cls.aggregated['summary'][hier_part]:
+                            cls.aggregated['summary'][hier_part]['analytics_last7days'] = cls.aggregated['summary'][hier_part]['analytics_last7days'] + v
+                        else:
+                            cls.aggregated['summary'][hier_part]['analytics_last7days'] = v
+
+                    last30days = report['last30days']['reports'][0]['data']['rows']
+                    for r in last30days:
+                        hier_part = '://example.com' + re.sub(r'\?.*', '', r['dimensions'][0])
+                        v = int(r['metrics'][0]['values'][0])
+                        row = {
+                            'hier_part': hier_part,
+                            'service': 'analytics',
+                            'metric': 'last30days',
+                            'value': v
+                        }
+
+                        index = next((index for (index, d) in enumerate(cls.aggregated['row']) if d['hier_part'] == hier_part and d['service'] == 'analytics' and d['metric'] == 'last30days'), None)
+                        if not index is None:
+                            cls.aggregated['row'][index]['value'] = cls.aggregated['row'][index]['value'] + v
+                        else:
+                            cls.aggregated['row'].append(row)
+
+                        if 'analytics_last30days' in cls.aggregated['summary'][hier_part]:
+                            cls.aggregated['summary'][hier_part]['analytics_last30days'] = cls.aggregated['summary'][hier_part]['analytics_last30days'] + v
+                        else:
+                            cls.aggregated['summary'][hier_part]['analytics_last30days'] = v
+
+                    total = report['total']['reports'][0]['data']['rows']
+                    for r in total:
+                        hier_part = '://example.com' + re.sub(r'\?.*', '', r['dimensions'][0])
+                        v = int(r['metrics'][0]['values'][0])
+                        row = {
+                            'hier_part': hier_part,
+                            'service': 'analytics',
+                            'metric': 'total',
+                            'value': v
+                        }
+
+                        index = next((index for (index, d) in enumerate(cls.aggregated['row']) if d['hier_part'] == hier_part and d['service'] == 'analytics' and d['metric'] == 'total'), None)
+                        if not index is None:
+                            cls.aggregated['row'][index]['value'] = cls.aggregated['row'][index]['value'] + v
+                        else:
+                            cls.aggregated['row'].append(row)
+
+                        if 'analytics_total' in cls.aggregated['summary'][hier_part]:
+                            cls.aggregated['summary'][hier_part]['analytics_total'] = cls.aggregated['summary'][hier_part]['analytics_total'] + v
+                        else:
+                            cls.aggregated['summary'][hier_part]['analytics_total'] = v
+
+
 
     def setUp(self):
         self.aggregated = type(self).aggregated
@@ -187,8 +262,8 @@ class AggregatorTest(unittest.TestCase):
 
             with self.subTest(type='row'):
                 self.assertEqual(
-                    sorted(lines, key=lambda x: (x['hier_part'], x['metric'])),
-                    sorted(self.aggregated['row'], key=lambda x: (x['hier_part'], x['metric']))
+                    sorted(lines, key=lambda x: (x['hier_part'], x['service'], x['metric'])),
+                    sorted(self.aggregated['row'], key=lambda x: (x['hier_part'], x['service'], x['metric']))
                 )
 
         with open_shards('./sample_output/' + 'output.result-bookmarks-*-of-*') as result_file:
