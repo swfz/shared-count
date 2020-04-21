@@ -24,16 +24,25 @@ class AggregatorTest(unittest.TestCase):
             'tag': [],
             'star': []
         }
+        cls.load_twitter()
+        cls.load_hatena()
+        cls.load_hatenastar()
+        cls.load_pocket()
+        cls.load_facebook()
+        cls.load_analytics()
 
-        def to_hier_part(url):
-            return re.sub(r'^http[s]?', '', url)
+    @classmethod
+    def to_hier_part(cls, url):
+        return re.sub(r'^http[s]?', '', url)
 
+    @classmethod
+    def load_twitter(cls):
         tw_files = glob.glob('./sample_input/raw-twitter-basic*.json')
         for filename in tw_files:
             with open(filename) as file:
                 for line in file:
                     row = json.loads(line)
-                    hier_part = to_hier_part(row['url'])
+                    hier_part = cls.to_hier_part(row['url'])
                     cls.aggregated['summary'][hier_part]['twitter_likes'] = row['likes']
                     cls.aggregated['summary'][hier_part]['twitter_shared'] = row['count']
                     count = {
@@ -53,13 +62,15 @@ class AggregatorTest(unittest.TestCase):
                     cls.aggregated['row'].append(count)
                     cls.aggregated['row'].append(likes)
 
+    @classmethod
+    def load_hatena(cls):
         hb_files = glob.glob('./sample_input/raw-hatena-basic*.json')
         for filename in hb_files:
             with open(filename) as file:
                 for line in file:
                     row = json.loads(line)
 
-                    hier_part = to_hier_part(row['requested_url'])
+                    hier_part = cls.to_hier_part(row['requested_url'])
                     comments = len(list(filter(lambda x: x['comment'] != '', row['bookmarks'])))
                     cls.aggregated['summary'][hier_part]['hatena_bookmark'] = row['count']
                     cls.aggregated['summary'][hier_part]['hatena_comments'] = comments
@@ -87,12 +98,14 @@ class AggregatorTest(unittest.TestCase):
                             t = {'url': row['url'], 'hier_part': hier_part, 'user': b['user'], 'tag': tag}
                             cls.aggregated['tag'].append(t)
 
+    @classmethod
+    def load_hatenastar(cls):
         star_files = glob.glob('./sample_input/raw-hatenastar-basic*.json')
         for filename in star_files:
             with open(filename) as file:
                 for line in file:
                     row = json.loads(line)
-                    hier_part = to_hier_part(row['entries'][0]['uri'])
+                    hier_part = cls.to_hier_part(row['entries'][0]['uri'])
                     star_count = len(row['entries'][0]['stars'])
                     colorstar_count = len(row['entries'][0]['colored_stars']) if 'colored_star' in row['entries'][0] else 0
 
@@ -127,12 +140,14 @@ class AggregatorTest(unittest.TestCase):
                                 'hier_part': hier_part
                             }))
 
+    @classmethod
+    def load_facebook(cls):
         fb_files = glob.glob('./sample_input/raw-facebook-basic*.json')
         for filename in fb_files:
             with open(filename) as file:
                 for line in file:
                     row = json.loads(line)
-                    hier_part = to_hier_part(row['id'])
+                    hier_part = cls.to_hier_part(row['id'])
                     cls.aggregated['summary'][hier_part]['facebook_share'] = row['og_object']['engagement']['count']
                     count = {
                         'url': row['id'],
@@ -143,12 +158,14 @@ class AggregatorTest(unittest.TestCase):
                     }
                     cls.aggregated['row'].append(count)
 
+    @classmethod
+    def load_pocket(cls):
         p_files = glob.glob('./sample_input/raw-pocket-basic*.json')
         for filename in p_files:
             with open(filename) as file:
                 for line in file:
                     row = json.loads(line)
-                    hier_part = to_hier_part(row['url'])
+                    hier_part = cls.to_hier_part(row['url'])
                     cls.aggregated['summary'][hier_part]['pocket_count'] = int(row['count'])
                     count = {
                         'url': row['url'],
@@ -159,6 +176,8 @@ class AggregatorTest(unittest.TestCase):
                     }
                     cls.aggregated['row'].append(count)
 
+    @classmethod
+    def load_analytics(cls):
         a_files = glob.glob('./sample_input/raw-analytics-basic*.json')
         for filename in a_files:
             with open(filename) as file:
@@ -232,9 +251,9 @@ class AggregatorTest(unittest.TestCase):
                             cls.aggregated['summary'][hier_part]['analytics_total'] = v
 
 
-
     def setUp(self):
         self.aggregated = type(self).aggregated
+
 
     def tearDown(self):
         pprint('teardown-----------------------------------------------------')
