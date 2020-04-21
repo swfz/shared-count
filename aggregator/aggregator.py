@@ -82,6 +82,11 @@ def run(argv=None, save_main_session=True):
             default='dev',
             help='execution environment.')
     parser.add_argument(
+            '--domain',
+            dest='domain',
+            default='example.com',
+            help='target metric domain.')
+    parser.add_argument(
             '--dataset',
             dest='dataset',
             default='sample:sample',
@@ -90,9 +95,12 @@ def run(argv=None, save_main_session=True):
     known_args, pipeline_args = parser.parse_known_args(argv)
 
     pprint(known_args.input)
+    pprint(f'start aggregate {known_args.domain}. metrics')
+
     pipeline_options = PipelineOptions(pipeline_args)
     pipeline_options.view_as(SetupOptions).save_main_session = save_main_session
 
+    transformer = Transform(domain=known_args.domain)
     p = beam.Pipeline(options=pipeline_options)
 
     mixed_data = p | 'READ' >> ReadFromText(known_args.input) \
@@ -100,13 +108,13 @@ def run(argv=None, save_main_session=True):
                    | 'ExcludeNone' >> beam.Filter(lambda e: e is not None) \
                    | 'DivideService' >> beam.ParDo(ExtractService()).with_outputs()
 
-    rows_twitter = mixed_data.twitter | beam.FlatMap(Transform().parse_twitter)
-    rows_pocket = mixed_data.pocket | beam.Map(Transform().parse_pocket)
-    rows_facebook = mixed_data.facebook | beam.Map(Transform().parse_facebook)
-    rows_analytics = mixed_data.analytics | beam.FlatMap(Transform().parse_analytics)
+    rows_twitter = mixed_data.twitter | beam.FlatMap(transformer.parse_twitter)
+    rows_pocket = mixed_data.pocket | beam.Map(transformer.parse_pocket)
+    rows_facebook = mixed_data.facebook | beam.Map(transformer.parse_facebook)
+    rows_analytics = mixed_data.analytics | beam.FlatMap(transformer.parse_analytics)
 
-    mixed_hatena = mixed_data.hatena | beam.FlatMap(Transform().parse_hatena)
-    mixed_hatenastar = mixed_data.hatenastar | beam.FlatMap(Transform().parse_hatena_star)
+    mixed_hatena = mixed_data.hatena | beam.FlatMap(transformer.parse_hatena)
+    mixed_hatenastar = mixed_data.hatenastar | beam.FlatMap(transformer.parse_hatena_star)
 
     hatena = (mixed_hatena, mixed_hatenastar) \
         | 'FlattenHatenaData' >> beam.Flatten() \

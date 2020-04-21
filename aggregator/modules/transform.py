@@ -5,6 +5,9 @@ from functools import reduce
 
 
 class Transform:
+    def __init__(self, domain='example.com'):
+        self.domain = f'://{domain}'
+
     def parse_hatena(self, element):
         url = element['requested_url']
         hier_part= re.sub(r'^http[s]?', '', url)
@@ -112,11 +115,9 @@ class Transform:
         }]
 
     def parse_analytics(self, element):
-        domain = '://swfz.hatenablog.com'
-
         def transform(row):
             return {
-                'hier_part': domain + roundPath(row['dimensions'][0]),
+                'hier_part': self.domain + roundPath(row['dimensions'][0]),
                 'value': int(row['metrics'][0]['values'][0]),
             }
 

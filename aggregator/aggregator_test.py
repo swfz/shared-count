@@ -158,6 +158,7 @@ class AggregatorTest(unittest.TestCase):
                     }
                     cls.aggregated['row'].append(count)
 
+
     def setUp(self):
         self.aggregated = type(self).aggregated
 
@@ -166,7 +167,7 @@ class AggregatorTest(unittest.TestCase):
 
 
     def test_basic(self):
-        run(['--input=%s' % './sample_input/raw-*.json', '--output=%s.result' % './sample_output/output'])
+        run(['--input=%s' % './sample_input/raw-*.json', '--output=%s.result' % './sample_output/output', '--domain=example.com'])
 
         with open_shards('./sample_output/' + 'output.result-summary-*-of-*') as result_file:
             lines = []
