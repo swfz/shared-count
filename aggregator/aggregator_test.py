@@ -51,13 +51,11 @@ class AggregatorTest(unittest.TestCase):
                     cls.aggregated['row'].append(count)
                     cls.aggregated['row'].append(likes)
 
-        hb_files = glob.glob('./sample_input/raw-hatena*.json')
+        hb_files = glob.glob('./sample_input/raw-hatena-basic*.json')
         for filename in hb_files:
             with open(filename) as file:
                 for line in file:
                     row = json.loads(line)
-                    if row is None:
-                        continue
 
                     hier_part = to_hier_part(row['requested_url'])
                     comments = len(list(filter(lambda x: x['comment'] != '', row['bookmarks'])))
@@ -86,6 +84,22 @@ class AggregatorTest(unittest.TestCase):
                         for tag in b['tags']:
                             t = {'url': row['url'], 'hier_part': hier_part, 'user': b['user'], 'tag': tag}
                             cls.aggregated['tag'].append(t)
+
+        fb_files = glob.glob('./sample_input/raw-facebook-basic*.json')
+        for filename in fb_files:
+            with open(filename) as file:
+                for line in file:
+                    row = json.loads(line)
+                    hier_part = to_hier_part(row['id'])
+                    cls.aggregated['summary'][hier_part]['facebook_share'] = row['og_object']['engagement']['count']
+                    count = {
+                        'url': row['id'],
+                        'hier_part': hier_part,
+                        'service': 'facebook',
+                        'metric': 'share',
+                        'value': row['og_object']['engagement']['count']
+                    }
+                    cls.aggregated['row'].append(count)
 
 
     def setUp(self):
@@ -124,7 +138,6 @@ class AggregatorTest(unittest.TestCase):
             lines = []
             for line in result_file:
                 lines.append(eval(line))
-            pprint(self.aggregated['bookmarks'])
             with self.subTest(type='bookmarks'):
                 self.assertEqual(
                     sorted(lines, key=lambda x: (x['hier_part'], x['timestamp'])),
