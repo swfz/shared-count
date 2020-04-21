@@ -17,8 +17,10 @@ class AggregatorTest(unittest.TestCase):
                 '://example.com/entry/1': {'hier_part': '://example.com/entry/1'},
                 '://example.com/entry/2': {'hier_part': '://example.com/entry/2'}
             },
-            'row': []
+            'row': [],
+            'tag': []
         }
+
         def to_hier_part(url):
             return re.sub(r'^http[s]?', '', url)
 
@@ -76,6 +78,12 @@ class AggregatorTest(unittest.TestCase):
                     cls.aggregated['row'].append(count)
                     cls.aggregated['row'].append(comments)
 
+                    for b in row['bookmarks']:
+                        for tag in b['tags']:
+                            t = {'url': row['url'], 'hier_part': hier_part, 'user': b['user'], 'tag': tag}
+                            cls.aggregated['tag'].append(t)
+
+
     def setUp(self):
         self.aggregated = type(self).aggregated
 
@@ -106,6 +114,17 @@ class AggregatorTest(unittest.TestCase):
                 self.assertEqual(
                     sorted(lines, key=lambda x: (x['hier_part'], x['metric'])),
                     sorted(self.aggregated['row'], key=lambda x: (x['hier_part'], x['metric']))
+                )
+
+        with open_shards('./sample_output/' + 'output.result-tag-*-of-*') as result_file:
+            lines = []
+            for line in result_file:
+                lines.append(eval(line))
+
+            with self.subTest(type='tag'):
+                self.assertEqual(
+                    sorted(lines, key=lambda x: (x['hier_part'], x['user'], x['tag'])),
+                    sorted(self.aggregated['tag'], key=lambda x: (x['hier_part'], x['user'], x['tag']))
                 )
 
 if __name__ == '__main__':
