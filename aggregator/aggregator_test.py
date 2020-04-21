@@ -5,7 +5,6 @@ import glob
 import re
 import json
 import datetime as dt
-from functools import reduce
 from pprint import pprint
 from aggregator import run
 from apache_beam.testing.util import open_shards
@@ -123,7 +122,7 @@ class AggregatorTest(unittest.TestCase):
                         }))
                     if 'colored_stars' in row['entries'][0]:
                         for colorstar in row['entries'][0]['colored_stars']:
-                            cls.aggregated['star'].append(dict(star, **{
+                            cls.aggregated['star'].append(dict(colorstar, **{
                                 'url': row['entries'][0]['uri'],
                                 'hier_part': hier_part
                             }))
