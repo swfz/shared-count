@@ -1,0 +1,39 @@
+name: aggregator io test
+
+on: [push]
+
+jobs:
+  aggregator:
+    runs-on: ubuntu-latest
+    name: input output test(aggregator.py)
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+        with:
+          python-version: '3.7'
+          architecture: 'x64'
+      - run: |
+          pip3 install --upgrade virtualenv --user
+          python3 -m virtualenv env
+          source env/bin/activate
+          pip3 install apache-beam[gcp] green
+          cd aggregator
+          green aggregator_test.py
+
+  timeseries:
+    runs-on: ubuntu-latest
+    name: input output test(timeseries.py)
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+        with:
+          python-version: '3.7'
+          architecture: 'x64'
+      - run: |
+          pip3 install --upgrade virtualenv --user
+          python3 -m virtualenv env
+          source env/bin/activate
+          pip3 install apache-beam[gcp] green
+          cd aggregator
+          green timeseries_test.py
+
