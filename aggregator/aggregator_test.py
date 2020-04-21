@@ -101,6 +101,21 @@ class AggregatorTest(unittest.TestCase):
                     }
                     cls.aggregated['row'].append(count)
 
+        p_files = glob.glob('./sample_input/raw-pocket-basic*.json')
+        for filename in p_files:
+            with open(filename) as file:
+                for line in file:
+                    row = json.loads(line)
+                    hier_part = to_hier_part(row['url'])
+                    cls.aggregated['summary'][hier_part]['pocket_count'] = int(row['count'])
+                    count = {
+                        'url': row['url'],
+                        'hier_part': hier_part,
+                        'service': 'pocket',
+                        'metric': 'count',
+                        'value': int(row['count'])
+                    }
+                    cls.aggregated['row'].append(count)
 
     def setUp(self):
         self.aggregated = type(self).aggregated
