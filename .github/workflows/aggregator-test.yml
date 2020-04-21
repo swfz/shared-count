@@ -5,7 +5,7 @@ on: [push]
 jobs:
   aggregator:
     runs-on: ubuntu-latest
-    name: input output test
+    name: input output test(aggregator.py)
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
@@ -22,7 +22,7 @@ jobs:
 
   timeseries:
     runs-on: ubuntu-latest
-    name: input output test
+    name: input output test(timeseries.py)
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
