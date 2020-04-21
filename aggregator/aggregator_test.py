@@ -21,6 +21,7 @@ class AggregatorTest(unittest.TestCase):
             'row': [],
             'bookmarks': [],
             'tag': [],
+            'star': []
         }
 
         def to_hier_part(url):
@@ -84,6 +85,46 @@ class AggregatorTest(unittest.TestCase):
                         for tag in b['tags']:
                             t = {'url': row['url'], 'hier_part': hier_part, 'user': b['user'], 'tag': tag}
                             cls.aggregated['tag'].append(t)
+
+        star_files = glob.glob('./sample_input/raw-hatenastar-basic*.json')
+        for filename in star_files:
+            with open(filename) as file:
+                for line in file:
+                    row = json.loads(line)
+                    hier_part = to_hier_part(row['entries'][0]['uri'])
+                    star_count = len(row['entries'][0]['stars'])
+                    colorstar_count = len(row['entries'][0]['colored_stars']) if 'colored_star' in row['entries'][0] else 0
+
+                    cls.aggregated['summary'][hier_part]['hatena_star'] = star_count
+                    cls.aggregated['summary'][hier_part]['hatena_colorstar'] = colorstar_count
+                    star = {
+                        'url': row['entries'][0]['uri'],
+                        'hier_part': hier_part,
+                        'service': 'hatena',
+                        'metric': 'star',
+                        'value': star_count
+                    }
+                    colorstar = {
+                        'url': row['entries'][0]['uri'],
+                        'hier_part': hier_part,
+                        'service': 'hatena',
+                        'metric': 'colorstar',
+                        'value': colorstar_count
+                    }
+                    cls.aggregated['row'].append(colorstar)
+                    cls.aggregated['row'].append(star)
+
+                    for star in row['entries'][0]['stars']:
+                        cls.aggregated['star'].append(dict(star, **{
+                            'url': row['entries'][0]['uri'],
+                            'hier_part': hier_part
+                        }))
+                    if 'colored_stars' in row['entries'][0]:
+                        for colorstar in row['entries'][0]['colored_stars']:
+                            cls.aggregated['star'].append(dict(star, **{
+                                'url': row['entries'][0]['uri'],
+                                'hier_part': hier_part
+                            }))
 
         fb_files = glob.glob('./sample_input/raw-facebook-basic*.json')
         for filename in fb_files:
@@ -168,6 +209,17 @@ class AggregatorTest(unittest.TestCase):
                 self.assertEqual(
                     sorted(lines, key=lambda x: (x['hier_part'], x['user'], x['tag'])),
                     sorted(self.aggregated['tag'], key=lambda x: (x['hier_part'], x['user'], x['tag']))
+                )
+
+        with open_shards('./sample_output/' + 'output.result-star-*-of-*') as result_file:
+            lines = []
+            for line in result_file:
+                lines.append(eval(line))
+
+            with self.subTest(type='star'):
+                self.assertEqual(
+                    sorted(lines, key=lambda x: (x['hier_part'], x['name'])),
+                    sorted(self.aggregated['star'], key=lambda x: (x['hier_part'], x['name']))
                 )
 
 if __name__ == '__main__':
