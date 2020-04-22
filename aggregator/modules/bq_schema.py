@@ -28,6 +28,20 @@ class HatenaSchema:
             }]
         }
 
+    comment = {
+            'fields': [{
+                'name': 'url', 'type': 'STRING', 'mode': 'REQUIRED'
+            }, {
+                'name': 'hier_part', 'type': 'STRING', 'mode': 'REQUIRED'
+            }, {
+                'name': 'user', 'type': 'STRING', 'mode': 'REQUIRED'
+            }, {
+                'name': 'comment', 'type': 'STRING', 'mode': 'NULLABLE'
+            }, {
+                'name': 'timestamp', 'type': 'DATETIME', 'mode': 'NULLABLE'
+            }]
+        }
+
     star = {
             'fields': [{
                 'name': 'url', 'type': 'STRING', 'mode': 'REQUIRED'
