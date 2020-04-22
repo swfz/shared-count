@@ -21,6 +21,7 @@ class AggregatorTest(unittest.TestCase):
             },
             'row': [],
             'bookmarks': [],
+            'comments': [],
             'tag': [],
             'star': []
         }
@@ -94,6 +95,11 @@ class AggregatorTest(unittest.TestCase):
                     for b in row['bookmarks']:
                         bookmark = dict(b, **{'url': row['url'], 'hier_part': hier_part, 'timestamp': dt.datetime.strptime(b['timestamp'], '%Y/%m/%d %H:%M').strftime('%Y-%m-%d %H:%M:%S')})
                         cls.aggregated['bookmarks'].append(bookmark)
+
+                        comment = bookmark.copy()
+                        del comment['tags']
+                        cls.aggregated['comments'].append(comment)
+
                         for tag in b['tags']:
                             t = {'url': row['url'], 'hier_part': hier_part, 'user': b['user'], 'tag': tag}
                             cls.aggregated['tag'].append(t)
@@ -292,6 +298,16 @@ class AggregatorTest(unittest.TestCase):
                 self.assertEqual(
                     sorted(lines, key=lambda x: (x['hier_part'], x['timestamp'])),
                     sorted(self.aggregated['bookmarks'], key=lambda x: (x['hier_part'], x['timestamp']))
+                )
+
+        with open_shards('./sample_output/' + 'output.result-comments-*-of-*') as result_file:
+            lines = []
+            for line in result_file:
+                lines.append(eval(line))
+            with self.subTest(type='comments'):
+                self.assertEqual(
+                    sorted(lines, key=lambda x: (x['hier_part'], x['timestamp'])),
+                    sorted(self.aggregated['comments'], key=lambda x: (x['hier_part'], x['timestamp']))
                 )
 
         with open_shards('./sample_output/' + 'output.result-tag-*-of-*') as result_file:

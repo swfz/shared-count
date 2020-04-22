@@ -18,8 +18,18 @@ class Transform:
                 'timestamp': dt.datetime.strptime(row['timestamp'], '%Y/%m/%d %H:%M').strftime('%Y-%m-%d %H:%M:%S')
             })
 
+        def transform_without_tags(row):
+            d = dict(row, **{
+                'url': url,
+                'hier_part': hier_part,
+                'timestamp': dt.datetime.strptime(row['timestamp'], '%Y/%m/%d %H:%M').strftime('%Y-%m-%d %H:%M:%S')
+            })
+            del d['tags']
+            return d
+
         bookmarks = map(transform, element['bookmarks'])
-        comments = len(list(filter(lambda row: row['comment'] != '', element['bookmarks'])))
+        comments = map(transform_without_tags, element['bookmarks'])
+        comments_count = len(list(filter(lambda row: row['comment'] != '', element['bookmarks'])))
 
         tags = []
 
@@ -43,10 +53,10 @@ class Transform:
             'hier_part': hier_part,
             'service': 'hatena',
             'metric': 'comments',
-            'value': comments
+            'value': comments_count
         }]
 
-        return list(bookmarks) + tags + summary
+        return list(bookmarks) + list(comments) + tags + summary
 
     def parse_hatena_star(self, element):
         url = element['entries'][0]['uri']

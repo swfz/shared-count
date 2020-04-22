@@ -38,8 +38,10 @@ class ExtractService(beam.DoFn):
 
 class ExtractHatena(beam.DoFn):
     def process(self, element):
-        if 'timestamp' in element:
+        if 'tags' in element:
             yield pvalue.TaggedOutput('bookmark', element)
+        elif 'timestamp' in element:
+            yield pvalue.TaggedOutput('comment', element)
         elif 'quote' in element:
             yield pvalue.TaggedOutput('star', element)
         elif 'tag' in element:
@@ -136,6 +138,12 @@ def run(argv=None, save_main_session=True):
                         write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
                         create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
                         )
+        hatena.comment | 'WriteCommentToBigQuery' >> beam.io.WriteToBigQuery(
+                        f'{known_args.dataset}.comment',
+                        schema=HatenaSchema.comment,
+                        write_disposition=beam.io.BigQueryDisposition.WRITE_TRUNCATE,
+                        create_disposition=beam.io.BigQueryDisposition.CREATE_IF_NEEDED
+                        )
         hatena.tag | 'WriteTagToBigQuery' >> beam.io.WriteToBigQuery(
                         f'{known_args.dataset}.tag',
                         schema=HatenaSchema.tag,
@@ -162,6 +170,7 @@ def run(argv=None, save_main_session=True):
                         )
     else:
         hatena.bookmark | 'WriteBookmarkToFile' >> WriteToText(f'{known_args.output}-bookmarks')
+        hatena.comment | 'WriteCommentToFile' >> WriteToText(f'{known_args.output}-comments')
         hatena.tag | 'WriteTagToFile' >> WriteToText(f'{known_args.output}-tag')
         hatena.star | 'WriteStarToFile' >> WriteToText(f'{known_args.output}-star')
         flattend_rows | 'WriteRowsToFile' >> WriteToText(f'{known_args.output}-row')
