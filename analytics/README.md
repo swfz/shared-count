@@ -14,7 +14,7 @@ gcloud pubsub topics create memo-collector-analytics
 dailyスケジュール
 
 ```
-gcloud scheduler jobs create pubsub publish-collector-analytics-job --schedule="1 1 * * *" --topic=memo-collector-analytics --message-body='{"url": "https://swfz.hatenablog.com", "service": "analytics"}'
+gcloud scheduler jobs create pubsub publish-collector-analytics-job --schedule="0 1 * * *" --topic=memo-collector-analytics --message-body='{"url": "https://swfz.hatenablog.com", "service": "analytics"}'
 ```
 
 ## development

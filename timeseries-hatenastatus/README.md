@@ -14,7 +14,7 @@ gcloud pubsub topics create memo-timeseries-hatenastatus
 dailyスケジュール
 
 ```
-gcloud scheduler jobs create pubsub publish-timeseries-hatenastatus-job --schedule="2 2 * * *" --topic=memo-timeseries-hatenastatus --message-body='{"url": "https://swfz.hatenablog.com", "service": "hatenastatus"}'
+gcloud scheduler jobs create pubsub publish-timeseries-hatenastatus-job --schedule="2 1 * * *" --topic=memo-timeseries-hatenastatus --message-body='{"url": "https://swfz.hatenablog.com", "service": "hatenastatus"}'
 ```
 
 ## development
