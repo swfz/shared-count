@@ -19,7 +19,7 @@ jobs:
           service_account_key: ${{ secrets.GCP_KEY }}
           export_default_credentials: true
       - run: |
-          gcloud scheduler jobs update pubsub publish-collector-analytics-job --schedule="0 10 * * *" --topic=memo-collector-analytics --message-body=\"{"url": "https://swfz.hatenablog.com", "service": "analytics"}\" --time-zone="Asia/Tokyo"
+          gcloud scheduler jobs update pubsub publish-collector-analytics-job --schedule="0 10 * * *" --topic=memo-collector-analytics --message-body='{"url": "https://swfz.hatenablog.com", "service": "analytics"}' --time-zone="Asia/Tokyo"
 
   # deploy-publish-job:
   #   runs-on: ubuntu-latest
