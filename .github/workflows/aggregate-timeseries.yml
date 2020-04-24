@@ -23,12 +23,15 @@ jobs:
           service_account_key: ${{ secrets.GCP_KEY }}
           export_default_credentials: true
 
+      - uses: actions/cache@v1
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('./requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
       - run: |
-          pip3 install --upgrade virtualenv --user
-          python3 -m virtualenv env
-          source env/bin/activate
-          pip3 install apache-beam[gcp]
           cd aggregator
+          pip3 install -r requirements.txt
           python3 timeseries.py --project ${{ secrets.GCP_PROJECT_ID }} \
             --setup_file ./setup.py \
             --runner DataflowRunner \
