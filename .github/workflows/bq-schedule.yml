@@ -1,0 +1,24 @@
+name: deploy cloud schduler
+
+on:
+  push:
+    paths:
+      - '.github/workflows/bq-schedule.yml'
+
+jobs:
+  deploy-schedule-query:
+    runs-on: ubuntu-latest
+    name: deploy schedule query
+    steps:
+      - uses: actions/checkout@v2
+      - name: Authenticate on GCS
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_email: ${{ secrets.GCP_EMAIL }}
+          service_account_key: ${{ secrets.GCP_KEY }}
+          export_default_credentials: true
+      - run: |
+          gcloud scheduler jobs update pubsub publish-collector-analytics-job --schedule="0 10 * * *" --topic=memo-collector-analytics --message-body='{"url": "https://swfz.hatenablog.com", "service": "analytics"}' --time-zone="Asia/Tokyo"
+
+
