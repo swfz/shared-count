@@ -1,5 +1,5 @@
 from typing_extensions import TypedDict
-from typing import Optional, List
+from typing import Optional, List, Union
 
 class Pocket(TypedDict):
     url: str
@@ -35,3 +35,17 @@ class Hatena(TypedDict):
     entry_url: str
     bookmarks: List[Bookmark]
     requested_url: str
+
+class Star(TypedDict):
+    name: str
+    quote: str
+
+class Entry(TypedDict):
+    uri: str
+    can_comment: int
+    stars: List[Star]
+    colored_stars: List[Star]
+
+class HatenaStar(TypedDict):
+    can_comment: int
+    entries: List[Entry]

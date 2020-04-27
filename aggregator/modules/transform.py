@@ -2,7 +2,7 @@ from pprint import pprint
 import datetime as dt
 import re
 from functools import reduce
-from modules.types import Pocket, Facebook, Hatena
+from modules.types import Pocket, Facebook, Hatena, HatenaStar
 
 
 class Transform:
@@ -59,7 +59,7 @@ class Transform:
 
         return list(bookmarks) + list(comments) + tags + summary
 
-    def parse_hatena_star(self, element):
+    def parse_hatena_star(self, element: HatenaStar):
         url = element['entries'][0]['uri']
         hier_part = re.sub(r'^http[s]?', '', url)
 
