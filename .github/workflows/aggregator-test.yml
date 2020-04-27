@@ -1,11 +1,57 @@
-name: aggregator io test
+name: aggregator test
 
 on: [push]
 
 jobs:
+  typecheck-aggregator:
+    runs-on: ubuntu-latest
+    name: typecheck(aggregator.py)
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+        with:
+          python-version: '3.7'
+          architecture: 'x64'
+
+      - uses: actions/cache@v1
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('./aggregator/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - run: |
+          cd aggregator
+          pip3 install -r requirements.txt
+          mypy aggregator.py
+
+  typecheck-timeseries:
+    runs-on: ubuntu-latest
+    name: typecheck(timeseries.py)
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v1
+        with:
+          python-version: '3.7'
+          architecture: 'x64'
+
+      - uses: actions/cache@v1
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('./aggregator/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - run: |
+          cd aggregator
+          pip3 install -r requirements.txt
+          mypy timeseries.py
+
+
   aggregator:
     runs-on: ubuntu-latest
     name: input output test(aggregator.py)
+    needs: typecheck-aggregator
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
@@ -28,6 +74,7 @@ jobs:
   timeseries:
     runs-on: ubuntu-latest
     name: input output test(timeseries.py)
+    needs: typecheck-timeseries
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v1
