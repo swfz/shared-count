@@ -1,9 +1,7 @@
-from pprint import pprint
 import datetime as dt
 import re
 from functools import reduce
 from modules.types import Pocket, Facebook, Hatena, HatenaStar, Twitter, Analytics, AnalyticsTempRow
-from typing_extensions import TypedDict
 from typing import Dict
 
 
