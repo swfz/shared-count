@@ -55,3 +55,9 @@ class HatenaStar(TypedDict):
     entries: List[Entry]
 
 
+class Twitter(TypedDict):
+    url: str
+    count: int
+    likes: int
+
+

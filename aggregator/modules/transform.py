@@ -2,7 +2,7 @@ from pprint import pprint
 import datetime as dt
 import re
 from functools import reduce
-from modules.types import Pocket, Facebook, Hatena, HatenaStar
+from modules.types import Pocket, Facebook, Hatena, HatenaStar, Twitter
 
 
 class Transform:
@@ -108,7 +108,7 @@ class Transform:
             'value': int(element['count'])
         }
 
-    def parse_twitter(self, element):
+    def parse_twitter(self, element: Twitter):
         url = element['url']
         hier_part = re.sub(r'^http[s]?', '', url)
         return [{
