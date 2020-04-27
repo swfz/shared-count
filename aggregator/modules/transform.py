@@ -2,14 +2,14 @@ from pprint import pprint
 import datetime as dt
 import re
 from functools import reduce
-from modules.types import Pocket, Facebook
+from modules.types import Pocket, Facebook, Hatena
 
 
 class Transform:
     def __init__(self, domain='example.com'):
         self.domain: str = f'://{domain}'
 
-    def parse_hatena(self, element):
+    def parse_hatena(self, element: Hatena):
         url = element['requested_url']
         hier_part= re.sub(r'^http[s]?', '', url)
         def transform(row):

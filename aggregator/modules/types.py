@@ -1,5 +1,5 @@
 from typing_extensions import TypedDict
-from typing import Optional
+from typing import Optional, List
 
 class Pocket(TypedDict):
     url: str
@@ -18,3 +18,20 @@ class OgObject(TypedDict):
 class Facebook(TypedDict):
     og_object: Optional[OgObject]
     id: str
+
+
+class Bookmark(TypedDict):
+    comment: str
+    user: str
+    tags: List[str]
+    timestamp: str
+
+class Hatena(TypedDict):
+    eid: str
+    count: str
+    screenshot: str
+    url: str
+    title: str
+    entry_url: str
+    bookmarks: List[Bookmark]
+    requested_url: str
