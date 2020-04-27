@@ -6,7 +6,6 @@ import apache_beam as beam # type: ignore
 import argparse
 import logging
 import json
-import re
 
 from apache_beam.options.pipeline_options import PipelineOptions # type: ignore
 from apache_beam.options.pipeline_options import SetupOptions
