@@ -26,6 +26,7 @@ class Bookmark(TypedDict):
     tags: List[str]
     timestamp: str
 
+
 class Hatena(TypedDict):
     eid: str
     count: str
@@ -36,9 +37,11 @@ class Hatena(TypedDict):
     bookmarks: List[Bookmark]
     requested_url: str
 
+
 class Star(TypedDict):
     name: str
     quote: str
+
 
 class Entry(TypedDict):
     uri: str
@@ -46,6 +49,9 @@ class Entry(TypedDict):
     stars: List[Star]
     colored_stars: List[Star]
 
+
 class HatenaStar(TypedDict):
     can_comment: int
     entries: List[Entry]
+
+
