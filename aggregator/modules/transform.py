@@ -2,7 +2,9 @@ from pprint import pprint
 import datetime as dt
 import re
 from functools import reduce
-from modules.types import Pocket, Facebook, Hatena, HatenaStar, Twitter
+from modules.types import Pocket, Facebook, Hatena, HatenaStar, Twitter, Analytics, AnalyticsTempRow
+from typing_extensions import TypedDict
+from typing import Dict
 
 
 class Transform:
@@ -125,7 +127,7 @@ class Transform:
             'value': element['likes'],
         }]
 
-    def parse_analytics(self, element):
+    def parse_analytics(self, element: Analytics):
         def transform(row):
             return {
                 'hier_part': self.domain + roundPath(row['dimensions'][0]),
@@ -150,13 +152,13 @@ class Transform:
         def format_values(range, rows):
             return map(lambda x: dict(x, **{'service': 'analytics', 'metric': range}), rows)
 
-        last7days_by_path = reduce(merge_row, element['last7days']['reports'][0]['data']['rows'], {})
+        last7days_by_path: Dict[str, AnalyticsTempRow] = reduce(merge_row, element['last7days']['reports'][0]['data']['rows'], {})
         formatted_last7days = format_values('last7days', last7days_by_path.values())
 
-        last30days_by_path = reduce(merge_row, element['last30days']['reports'][0]['data']['rows'], {})
+        last30days_by_path: Dict[str, AnalyticsTempRow] = reduce(merge_row, element['last30days']['reports'][0]['data']['rows'], {})
         formatted_last30days = format_values('last30days', last30days_by_path.values())
 
-        total_by_path = reduce(merge_row, element['total']['reports'][0]['data']['rows'], {})
+        total_by_path: Dict[str, AnalyticsTempRow] = reduce(merge_row, element['total']['reports'][0]['data']['rows'], {})
         formatted_total = format_values('total', total_by_path.values())
 
         return list(formatted_last7days) + list(formatted_last30days) + list(formatted_total)

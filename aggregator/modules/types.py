@@ -61,3 +61,50 @@ class Twitter(TypedDict):
     likes: int
 
 
+class MetricHeaderEntry(TypedDict):
+    name: str
+    type: str
+
+
+class MetricHeader(TypedDict):
+    metricHeaderEntries: List[MetricHeaderEntry]
+
+
+class ColumnHeader(TypedDict):
+    dimensions: List[str]
+    metricHeader: MetricHeader
+
+
+class Metric(TypedDict):
+    values: List[str]
+
+
+class Row(TypedDict):
+    dimensions: List[str]
+    metrics: List[Metric]
+
+
+class Data(TypedDict):
+    rows: List[Row]
+    totals: List[Metric]
+    rowCount: int
+    minimums: List[Metric]
+    maximums: List[Metric]
+
+
+class Report(TypedDict):
+    columnHeader: ColumnHeader
+    data: Data
+
+
+class AnalyticsResponse(TypedDict):
+    reports: List[Report]
+
+
+class Analytics(TypedDict):
+    last7days: AnalyticsResponse
+    last30days: AnalyticsResponse
+    total: AnalyticsResponse
+
+
+AnalyticsTempRow = TypedDict('AnalyticsTempRow', {'hier_part': str, 'value': int})
