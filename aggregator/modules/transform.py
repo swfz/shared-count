@@ -1,14 +1,15 @@
-from pprint import pprint
 import datetime as dt
 import re
 from functools import reduce
+from modules.types import Pocket, Facebook, Hatena, HatenaStar, Twitter, Analytics, AnalyticsTempRow
+from typing import Dict
 
 
 class Transform:
     def __init__(self, domain='example.com'):
-        self.domain = f'://{domain}'
+        self.domain: str = f'://{domain}'
 
-    def parse_hatena(self, element):
+    def parse_hatena(self, element: Hatena):
         url = element['requested_url']
         hier_part= re.sub(r'^http[s]?', '', url)
         def transform(row):
@@ -58,7 +59,7 @@ class Transform:
 
         return list(bookmarks) + list(comments) + tags + summary
 
-    def parse_hatena_star(self, element):
+    def parse_hatena_star(self, element: HatenaStar):
         url = element['entries'][0]['uri']
         hier_part = re.sub(r'^http[s]?', '', url)
 
@@ -83,10 +84,10 @@ class Transform:
 
         return list(stars) + summary
 
-    def parse_facebook(self, element):
+    def parse_facebook(self, element: Facebook):
         url = element['id']
         hier_part = re.sub(r'^http[s]?', '', url)
-        value = element['og_object']['engagement']['count'] if 'og_object' in element else 0
+        value = element['og_object']['engagement']['count'] if not element['og_object'] is None else 0
 
         return {
             'url': url,
@@ -96,7 +97,7 @@ class Transform:
             'value': value
         }
 
-    def parse_pocket(self, element):
+    def parse_pocket(self, element: Pocket):
         url = element['url']
         hier_part = re.sub(r'^http[s]?', '', url)
         return {
@@ -107,7 +108,7 @@ class Transform:
             'value': int(element['count'])
         }
 
-    def parse_twitter(self, element):
+    def parse_twitter(self, element: Twitter):
         url = element['url']
         hier_part = re.sub(r'^http[s]?', '', url)
         return [{
@@ -124,7 +125,7 @@ class Transform:
             'value': element['likes'],
         }]
 
-    def parse_analytics(self, element):
+    def parse_analytics(self, element: Analytics):
         def transform(row):
             return {
                 'hier_part': self.domain + roundPath(row['dimensions'][0]),
@@ -149,13 +150,13 @@ class Transform:
         def format_values(range, rows):
             return map(lambda x: dict(x, **{'service': 'analytics', 'metric': range}), rows)
 
-        last7days_by_path = reduce(merge_row, element['last7days']['reports'][0]['data']['rows'], {})
+        last7days_by_path: Dict[str, AnalyticsTempRow] = reduce(merge_row, element['last7days']['reports'][0]['data']['rows'], {})
         formatted_last7days = format_values('last7days', last7days_by_path.values())
 
-        last30days_by_path = reduce(merge_row, element['last30days']['reports'][0]['data']['rows'], {})
+        last30days_by_path: Dict[str, AnalyticsTempRow] = reduce(merge_row, element['last30days']['reports'][0]['data']['rows'], {})
         formatted_last30days = format_values('last30days', last30days_by_path.values())
 
-        total_by_path = reduce(merge_row, element['total']['reports'][0]['data']['rows'], {})
+        total_by_path: Dict[str, AnalyticsTempRow] = reduce(merge_row, element['total']['reports'][0]['data']['rows'], {})
         formatted_total = format_values('total', total_by_path.values())
 
         return list(formatted_last7days) + list(formatted_last30days) + list(formatted_total)

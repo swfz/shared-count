@@ -1,22 +1,20 @@
 #!/usr/bin/env python3
 # coding=utf-8
 
-import apache_beam as beam
+import apache_beam as beam # type: ignore
 
 import argparse
 import logging
 import json
 
-from apache_beam.options.pipeline_options import PipelineOptions
+from apache_beam.options.pipeline_options import PipelineOptions # type: ignore
 from apache_beam.options.pipeline_options import SetupOptions
-from apache_beam.io import ReadFromText
+from apache_beam.io import ReadFromText # type: ignore
 from apache_beam.io import WriteToText
 from functools import reduce
 from pprint import pprint
-from apache_beam import pvalue
 
 from modules.bq_schema import HatenaSchema, BqSchema
-from modules.transform import Transform
 
 def merge_metrics(tpl):
     key, values = tpl
