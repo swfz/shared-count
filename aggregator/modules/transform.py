@@ -2,11 +2,12 @@ from pprint import pprint
 import datetime as dt
 import re
 from functools import reduce
+from modules.types import Pocket, Facebook
 
 
 class Transform:
     def __init__(self, domain='example.com'):
-        self.domain = f'://{domain}'
+        self.domain: str = f'://{domain}'
 
     def parse_hatena(self, element):
         url = element['requested_url']
@@ -83,10 +84,10 @@ class Transform:
 
         return list(stars) + summary
 
-    def parse_facebook(self, element):
+    def parse_facebook(self, element: Facebook):
         url = element['id']
         hier_part = re.sub(r'^http[s]?', '', url)
-        value = element['og_object']['engagement']['count'] if 'og_object' in element else 0
+        value = element['og_object']['engagement']['count'] if not element['og_object'] is None else 0
 
         return {
             'url': url,
@@ -96,7 +97,7 @@ class Transform:
             'value': value
         }
 
-    def parse_pocket(self, element):
+    def parse_pocket(self, element: Pocket):
         url = element['url']
         hier_part = re.sub(r'^http[s]?', '', url)
         return {
