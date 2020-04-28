@@ -2,7 +2,7 @@ import datetime as dt
 import re
 from functools import reduce
 from modules.types import Pocket, Facebook, Hatena, HatenaStar, Twitter, Analytics, AnalyticsTempRow
-from typing import Dict
+from typing import Dict, Iterable
 
 
 class Transform:
@@ -73,7 +73,7 @@ class Transform:
 
             return acc
 
-        stars = reduce(sum_by_name, element['entries'][0]['stars'], [])
+        stars: Iterable[Dict[str,object]] = reduce(sum_by_name, element['entries'][0]['stars'], [])
 
         star = len(element['entries'][0]['stars']) if 'stars' in element['entries'][0] else 0
         colored = len(element['entries'][0]['colored_stars']) if 'colored_stars' in element['entries'][0] else 0
