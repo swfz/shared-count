@@ -1,1 +1,1 @@
-{"entries":[{"uri":"https://example.com/entry/1","can_comment":0,"stars":[{"name":"hoge","quote":""},{"quote":"","name":"fuga"},{"name":"piyo","quote":""}]}],"can_comment":0}
+{"entries":[{"uri":"https://example.com/entry/1","can_comment":0,"stars":[{"name":"hoge","quote":""},{"quote":"","name":"fuga"},{"quote":"","name":"fuga"},{"name":"piyo","quote":""}]}],"can_comment":0}
