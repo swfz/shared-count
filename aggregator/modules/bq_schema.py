@@ -51,6 +51,8 @@ class HatenaSchema:
                 'name': 'name', 'type': 'STRING', 'mode': 'REQUIRED'
             }, {
                 'name': 'quote', 'type': 'STRING', 'mode': 'NULLABLE'
+            }, {
+                'name': 'uniq_value', 'type': 'STRING', 'mode': 'NULLABLE'
             }]
         }
 

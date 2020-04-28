@@ -135,9 +135,13 @@ class AggregatorTest(unittest.TestCase):
                     cls.aggregated['row'].append(star)
 
                     for star in row['entries'][0]['stars']:
+                        name = star['name']
+                        num = len(list(filter(lambda x: x['name'] == name, cls.aggregated['star'])))
+                        uniq_value = f'{hier_part}-{name}-{num}'
                         cls.aggregated['star'].append(dict(star, **{
                             'url': row['entries'][0]['uri'],
-                            'hier_part': hier_part
+                            'hier_part': hier_part,
+                            'uniq_value': uniq_value
                         }))
                     if 'colored_stars' in row['entries'][0]:
                         for colorstar in row['entries'][0]['colored_stars']:

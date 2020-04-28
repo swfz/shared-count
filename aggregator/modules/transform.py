@@ -2,7 +2,7 @@ import datetime as dt
 import re
 from functools import reduce
 from modules.types import Pocket, Facebook, Hatena, HatenaStar, Twitter, Analytics, AnalyticsTempRow
-from typing import Dict
+from typing import Dict, Iterable
 
 
 class Transform:
@@ -63,7 +63,17 @@ class Transform:
         url = element['entries'][0]['uri']
         hier_part = re.sub(r'^http[s]?', '', url)
 
-        stars = map(lambda row: dict(row, **{'url': url, 'hier_part': hier_part}), element['entries'][0]['stars'])
+        def sum_by_name(acc, row):
+            name = row['name']
+            num = len(list(filter(lambda x: x['name'] == row['name'], acc)))
+            uniq_value = f'{hier_part}-{name}-{num}'
+
+            r = dict(row, **{'url': url, 'hier_part': hier_part, 'uniq_value': uniq_value})
+            acc.append(r)
+
+            return acc
+
+        stars: Iterable[Dict[str,object]] = reduce(sum_by_name, element['entries'][0]['stars'], [])
 
         star = len(element['entries'][0]['stars']) if 'stars' in element['entries'][0] else 0
         colored = len(element['entries'][0]['colored_stars']) if 'colored_stars' in element['entries'][0] else 0
