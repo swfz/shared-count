@@ -30,7 +30,7 @@ class Transform:
 
         bookmarks = map(transform, element['bookmarks'])
         comments = map(transform_without_tags, element['bookmarks'])
-        comments_count = len(list(filter(lambda row: row['comment'] != '', element['bookmarks'])))
+        comments_count = len([row for row in element['bookmarks'] if row['comment'] != ''])
 
         tags = []
 
@@ -65,7 +65,7 @@ class Transform:
 
         def sum_by_name(acc, row):
             name = row['name']
-            num = len(list(filter(lambda x: x['name'] == row['name'], acc)))
+            num = len([x for x in acc if x['name'] == row['name']])
             uniq_value = f'{hier_part}-{name}-{num}'
 
             r = dict(row, **{'url': url, 'hier_part': hier_part, 'uniq_value': uniq_value})
@@ -158,7 +158,7 @@ class Transform:
             return acc
 
         def format_values(range, rows):
-            return map(lambda x: dict(x, **{'service': 'analytics', 'metric': range}), rows)
+            return [dict(x, **{'service': 'analytics', 'metric': range}) for x in rows]
 
         last7days_by_path: Dict[str, AnalyticsTempRow] = reduce(merge_row, element['last7days']['reports'][0]['data']['rows'], {})
         formatted_last7days = format_values('last7days', last7days_by_path.values())
