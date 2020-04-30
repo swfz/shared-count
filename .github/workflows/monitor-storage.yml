@@ -1,6 +1,5 @@
 name: check gcs timestamp
 on:
-  push:
   schedule:
     - cron: '0 2 * * *'
 
