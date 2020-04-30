@@ -1,4 +1,4 @@
-name: timeseries metric
+name: check gcs timestamp
 on:
   push:
   schedule:
@@ -7,7 +7,7 @@ on:
 jobs:
   monitor-gcs:
     runs-on: ubuntu-latest
-    name: check storage by article url
+    name: check storage updated
     steps:
       - uses: actions/checkout@v2
       - name: Authenticate on GCS
