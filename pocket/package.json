@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "functions-framework --target=collectPocketCount --signature-type=event",
-    "deploy": "gcloud functions deploy collectPocketCount --trigger-topic=memo-collector-pocket --runtime nodejs10 --region asia-northeast1 --memory=512MB --set-env-vars BUCKET=memo-raw-data",
+    "deploy": "gcloud functions deploy collectPocketCount --trigger-topic=memo-collector-pocket --runtime nodejs10 --region asia-northeast1 --memory=1024MB --set-env-vars BUCKET=memo-raw-data",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
