@@ -35,7 +35,7 @@ jobs:
           pip3 install -r requirements.txt
           python3 timeseries.py --project ${{ secrets.GCP_PROJECT_ID }} \
             --setup_file ./setup.py \
-            --runner DataflowRunner \
+            --runner DirectRunner \
             --region asia-northeast1 \
             --temp_location gs://${{ secrets.GCP_DATAFLOW_STORAGE }}/temp \
             --job_name aggregate-timeseries \
