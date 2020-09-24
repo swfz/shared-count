@@ -50,3 +50,14 @@ jobs:
           export_default_credentials: true
       - run: |
           gcloud scheduler jobs update pubsub publish-timeseries-hatenastatus-job --schedule="2 10 * * *" --topic=memo-timeseries-hatenastatus --message-body='{"url": "https://swfz.hatenablog.com", "service": "hatenastatus"}' --time-zone="Asia/Tokyo"
+
+  slack-notify:
+    if: always()
+    needs: [deploy-publish-collector-analytics-job, deploy-publish-job, deploy-publish-timeseries-hatenastatus-job]
+    name: post slack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Gamesight/slack-workflow-status@master
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}

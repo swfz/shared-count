@@ -26,3 +26,14 @@ jobs:
           bq query --project_id=${{ secrets.GCP_PROJECT_ID }} --format json < /tmp/timeseries-shared.sql
           bq query --project_id=${{ secrets.GCP_PROJECT_ID }} --format json < /tmp/timeseries-shared.sql | jq -cr --arg date ${d} '.[]|.date|=$date' > /tmp/${d}.json
           gsutil cp /tmp/${d}.json gs://${{ secrets.GCP_INPUT_STORAGE }}/timeseries/service=sns/${d}.json
+
+  slack-notify:
+    if: always()
+    needs: [plot-daily-metrics]
+    name: post slack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Gamesight/slack-workflow-status@master
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}

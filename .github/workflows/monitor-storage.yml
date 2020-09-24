@@ -20,5 +20,13 @@ jobs:
         run: |
           gsutil ls -l 'gs://memo-raw-data/share-count/service=*/*' | sed -e '$d' | ./gs-lt.sh
 
-
-
+  slack-notify:
+    if: always()
+    needs: [monitor-gcs]
+    name: post slack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: Gamesight/slack-workflow-status@master
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
