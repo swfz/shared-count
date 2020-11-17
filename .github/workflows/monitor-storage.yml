@@ -8,9 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     name: check storage updated
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
       - name: Authenticate on GCS
-        uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@v0.2.0
         with:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_email: ${{ secrets.GCP_EMAIL }}
@@ -26,7 +26,7 @@ jobs:
     name: post slack
     runs-on: ubuntu-latest
     steps:
-      - uses: Gamesight/slack-workflow-status@master
+      - uses: Gamesight/slack-workflow-status@v1.0.1
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
