@@ -34,7 +34,7 @@ jobs:
     name: post slack
     runs-on: ubuntu-latest
     steps:
-      - uses: Gamesight/slack-workflow-status@1.0.1
+      - uses: Gamesight/slack-workflow-status@v1.0.1
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
