@@ -40,5 +40,11 @@ python aggregator.py --project memo-000000 --env dev --runner DirectRunner --inp
 python aggregator.py --project memo-000000 --env prod --table memo-000000:blog_data.summary --runner DataflowRunner --temp_location gs://memo-000000/temp --input 'gs://memo-raw-data/share-count/service=*/*' --output gs://memo-000000/results/output/aggregate --job_name aggregate
 ```
 
+### dependencies
+- apache-beam
+- google-cloud-bigquery
+- google-cloud-storage
+- mypy
+- green
 
 
