@@ -110,12 +110,14 @@ class Transform:
     def parse_pocket(self, element: Pocket):
         url = element['url']
         hier_part = re.sub(r'^http[s]?', '', url)
+        value = int(element['count']) if element['count'].isdecimal() else None
+
         return {
             'url': url,
             'hier_part': hier_part,
             'service': 'pocket',
             'metric': 'count',
-            'value': int(element['count'])
+            'value': value
         }
 
     def parse_twitter(self, element: Twitter):
