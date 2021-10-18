@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     name: typecheck(aggregator.py)
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
       - uses: actions/setup-python@v2.1.4
         with:
           python-version: '3.7'
@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     name: typecheck(timeseries.py)
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
       - uses: actions/setup-python@v2.1.4
         with:
           python-version: '3.7'
@@ -53,7 +53,7 @@ jobs:
     name: input output test(aggregator.py)
     needs: typecheck-aggregator
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
       - uses: actions/setup-python@v2.1.4
         with:
           python-version: '3.7'
@@ -76,7 +76,7 @@ jobs:
     name: input output test(timeseries.py)
     needs: typecheck-timeseries
     steps:
-      - uses: actions/checkout@v2.3.4
+      - uses: actions/checkout@v2.3.5
       - uses: actions/setup-python@v2.1.4
         with:
           python-version: '3.7'
