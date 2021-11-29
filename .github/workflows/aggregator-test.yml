@@ -8,7 +8,7 @@ jobs:
     name: typecheck(aggregator.py)
     steps:
       - uses: actions/checkout@v2.3.4
-      - uses: actions/setup-python@v2.1.4
+      - uses: actions/setup-python@v2.3.1
         with:
           python-version: '3.7'
           architecture: 'x64'
@@ -30,7 +30,7 @@ jobs:
     name: typecheck(timeseries.py)
     steps:
       - uses: actions/checkout@v2.3.4
-      - uses: actions/setup-python@v2.1.4
+      - uses: actions/setup-python@v2.3.1
         with:
           python-version: '3.7'
           architecture: 'x64'
@@ -54,7 +54,7 @@ jobs:
     needs: typecheck-aggregator
     steps:
       - uses: actions/checkout@v2.3.4
-      - uses: actions/setup-python@v2.1.4
+      - uses: actions/setup-python@v2.3.1
         with:
           python-version: '3.7'
           architecture: 'x64'
@@ -77,7 +77,7 @@ jobs:
     needs: typecheck-timeseries
     steps:
       - uses: actions/checkout@v2.3.4
-      - uses: actions/setup-python@v2.1.4
+      - uses: actions/setup-python@v2.3.1
         with:
           python-version: '3.7'
           architecture: 'x64'
