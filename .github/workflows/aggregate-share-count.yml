@@ -11,7 +11,7 @@ jobs:
     name: aggregate blog data
     steps:
       - uses: actions/checkout@v3.0.2
-      - uses: actions/setup-python@v2.1.4
+      - uses: actions/setup-python@v3.1.2
         with:
           python-version: '3.7'
           architecture: 'x64'
