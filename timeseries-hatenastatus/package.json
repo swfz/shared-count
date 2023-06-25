@@ -14,7 +14,7 @@
     "@google-cloud/functions-framework": "^1.5.1"
   },
   "dependencies": {
-    "@google-cloud/storage": "^4.7.0",
+    "@google-cloud/storage": "^6.11.0",
     "moment": "^2.29.2",
     "puppeteer": "^2.1.1"
   }
